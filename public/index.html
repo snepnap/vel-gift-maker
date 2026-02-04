@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine Builder • Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: rgba(15, 15, 17, 0.8);
+            --bg-tertiary: rgba(24, 24, 27, 0.9);
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(244, 63, 94, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            --accent: #f43f5e;
+            --accent-purple: #a855f7;
+            --accent-cyan: #22d3ee;
+            --glass-blur: 20px;
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: rgba(255, 255, 255, 0.9);
+            --bg-tertiary: rgba(245, 245, 245, 0.95);
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --border: rgba(0, 0, 0, 0.08);
+            --text-primary: #18181b;
+            --text-secondary: #52525b;
+            --text-muted: #a1a1aa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Animated Gradient Mesh Background */
+        .gradient-mesh {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .gradient-mesh::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(244, 63, 94, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 10% 70%, rgba(244, 114, 182, 0.08) 0%, transparent 50%);
+            animation: meshMove 20s ease-in-out infinite;
+        }
+
+        @keyframes meshMove {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(3%, 3%) rotate(1deg);
+            }
+
+            66% {
+                transform: translate(-2%, 2%) rotate(-1deg);
+            }
+        }
+
+        /* Layout */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 72px 1fr 420px;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-layout.panel-closed {
+            grid-template-columns: 72px 1fr 0px;
+        }
+
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0;
+            gap: 6px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #f43f5e, #a855f7);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(244, 63, 94, 0.4);
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 4px 20px rgba(244, 63, 94, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 4px 30px rgba(168, 85, 247, 0.5);
+            }
+        }
+
+        .sidebar-item {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.3s var(--transition-smooth);
+            font-size: 18px;
+            position: relative;
+        }
+
+        .sidebar-item:hover {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            transform: scale(1.08);
+        }
+
+        .sidebar-item.active {
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(168, 85, 247, 0.1));
+            color: var(--accent);
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);
+        }
+
+        .sidebar-item.active::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            width: 3px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-purple));
+            border-radius: 0 3px 3px 0;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .sidebar-item[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 60px;
+            background: var(--bg-tertiary);
+            backdrop-filter: blur(10px);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            z-index: 100;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: tooltipFade 0.2s ease;
+        }
+
+        @keyframes tooltipFade {
+            from {
+                opacity: 0;
+                transform: translateX(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .sidebar-divider {
+            width: 28px;
+            height: 1px;
+            background: var(--border);
+            margin: 8px 0;
+        }
+
+        .sidebar-spacer {
+            flex: 1;
+        }
+
+
+        .sidebar-divider {
+            width: 28px;
+            height: 1px;
+            background: var(--border);
+            margin: 10px 0;
+        }
+
+        .sidebar-spacer {
+            flex: 1;
+        }
+
+        /* Main Canvas */
+        .canvas-area {
+            background: #030303;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .canvas-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: 0.5;
+            background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.04) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+
+        /* Device Preview */
+        .preview-container {
+            position: relative;
+            z-index: 10;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .preview-desktop {
+            width: calc(100% - 60px);
+            height: calc(100% - 60px);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 40px 80px -20px rgba(0, 0, 0, 0.8);
+        }
+
+        .preview-mobile {
+            width: 340px;
+            height: 700px;
+            border-radius: 44px;
+            overflow: hidden;
+            background: linear-gradient(145deg, #27272a, #18181b);
+            padding: 10px;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 50px 100px -20px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .preview-mobile .preview-screen {
+            border-radius: 36px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .preview-mobile {
+            width: 370px;
+            height: 750px;
+            background: #000;
+            border-radius: 56px;
+            box-shadow:
+                0 0 0 2px #334155,
+                0 0 0 8px #1e293b,
+                0 0 0 10px #0f172a,
+                0 40px 80px rgba(0, 0, 0, 0.6);
+            position: relative;
+            transform-origin: center top;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border: 6px solid #1a1a1a;
+            margin-top: 20px;
+        }
+
+        .preview-screen {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+            border-radius: 48px;
+            mask-image: radial-gradient(white, black);
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+            border-radius: 44px;
+            /* Slightly tighter than frame */
+        }
+
+        .preview-mobile .notch {
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 32px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 100;
+        }
+
+        .preview-mobile .notch::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            width: 10px;
+            height: 10px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Phone Buttons */
+        .preview-mobile::before {
+            content: '';
+            position: absolute;
+            top: 160px;
+            right: -13px;
+            width: 4px;
+            height: 50px;
+            background: #1e293b;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .preview-mobile::after {
+            content: '';
+            position: absolute;
+            top: 130px;
+            left: -13px;
+            width: 4px;
+            height: 90px;
+            background: #1e293b;
+            border-radius: 4px 0 0 4px;
+            box-shadow: 0 120px 0 0 #1e293b;
+            /* Second button */
+        }
+
+        .preview-mobile.landscape {
+            width: 750px;
+            height: 370px;
+            border-radius: 56px;
+            margin-top: 50px;
+        }
+
+
+        /* Toolbar */
+        .toolbar {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            padding: 6px;
+            background: rgba(24, 24, 27, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            z-index: 20;
+        }
+
+        .toolbar-btn {
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+        }
+
+        .toolbar-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .toolbar-btn.active {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            align-self: center;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .panel-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .panel-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .panel-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            background: transparent;
+            border: none;
+        }
+
+        .panel-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        .panel-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .panel-body::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-textarea {
+            resize: none;
+            min-height: 140px;
+            line-height: 1.7;
+        }
+
+        /* Cards - Glassmorphism */
+        .card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s var(--transition-smooth);
+        }
+
+        .card:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Buttons - Enhanced */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            transform: translateX(100%);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(244, 63, 94, 0.4);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 13px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border-glow);
+            transform: translateY(-1px);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        /* Floating Bottom Action Bar */
+        .bottom-action-bar {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--bg-secondary);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            box-shadow: 0 4px 20px rgba(244, 63, 94, 0.4);
+        }
+
+        .action-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+        }
+
+        /* Progress Indicator */
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--border);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-purple), var(--accent-cyan));
+            background-size: 200% 100%;
+            animation: progressShimmer 2s linear infinite;
+            transition: width 0.5s var(--transition-smooth);
+        }
+
+        @keyframes progressShimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Live Badge */
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #22c55e;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: livePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* Publish Area */
+        .publish-area {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-secondary);
+            backdrop-filter: blur(var(--glass-blur));
+        }
+
+        /* Animation Effects Toggle Grid */
+        .effects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .effect-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 8px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .effect-item:hover {
+            border-color: var(--border-glow);
+            transform: scale(1.05);
+        }
+
+        .effect-item.active {
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(168, 85, 247, 0.1));
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .effect-item .icon {
+            font-size: 24px;
+        }
+
+        /* Device Frame Selector */
+        .device-selector {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            background: var(--bg-glass);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .device-option {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .device-option:hover {
+            color: var(--text-secondary);
+        }
+
+        .device-option.active {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+
+        .device-option .device-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Share Buttons */
+        .share-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .share-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .share-btn.whatsapp {
+            background: #25d366;
+            color: white;
+        }
+
+        .share-btn.whatsapp:hover {
+            background: #20bd5a;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+        }
+
+        .share-btn.copy {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .share-btn.copy:hover {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+        }
+
+        .share-btn.download {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+        }
+
+        .share-btn.download:hover {
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Feature Pills - Horizontal Scroll */
+        .feature-pills {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 0 12px 0;
+            scrollbar-width: none;
+        }
+
+        .feature-pills::-webkit-scrollbar {
+            display: none;
+        }
+
+        .feature-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .feature-pill:hover {
+            border-color: var(--border-glow);
+            color: var(--text-secondary);
+        }
+
+        .feature-pill.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            border-color: transparent;
+            color: white;
+        }
+
+        .feature-pill .pill-icon {
+            font-size: 14px;
+        }
+
+
+        /* Theme Cards */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .theme-card {
+            aspect-ratio: 4/3;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .theme-card.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.2);
+        }
+
+        .theme-card-bg {
+            position: absolute;
+            inset: 0;
+        }
+
+        .theme-card-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+        }
+
+        .theme-card-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .theme-card-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Color Picker */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+        }
+
+        .color-swatch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+
+        .color-swatch.active {
+            border-color: white;
+            box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px currentColor;
+        }
+
+        /* Font Selector */
+        .font-option {
+            padding: 14px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .font-option:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .font-option.active {
+            border-color: var(--accent);
+            background: rgba(244, 63, 94, 0.05);
+        }
+
+        .font-preview {
+            font-size: 18px;
+        }
+
+        .font-name {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Slider */
+        .slider-container {
+            padding: 8px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-tertiary);
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(244, 63, 94, 0.4);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Template Cards */
+        .template-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .template-card {
+            padding: 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            background: var(--bg-tertiary);
+        }
+
+        .template-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .template-card-icon {
+            font-size: 24px;
+        }
+
+        .template-card-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .template-card-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Feature Toggle */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .feature-item {
+            padding: 14px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .feature-item:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .feature-item.active {
+            border-color: var(--accent);
+            background: rgba(244, 63, 94, 0.06);
+        }
+
+        .feature-item .icon {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .feature-item .name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .feature-item .price {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px;
+            width: 400px;
+            text-align: center;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+
+        .modal-backdrop.open .modal-card {
+            transform: scale(1);
+        }
+
+        /* Loader */
+        .loader {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Keyboard Shortcut Badge */
+        .kbd {
+            display: inline-flex;
+            padding: 3px 6px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        /* Export Button */
+        .export-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+        }
+
+        .export-btn:hover {
+            background: var(--bg-primary);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const FEATURES = [
+            { id: 'feature_gallery', icon: '📸', label: 'Gallery', price: 69, desc: 'Photo memories' },
+            { id: 'feature_music', icon: '🎵', label: 'Music', price: 49, desc: 'Background audio' },
+            { id: 'feature_timeline', icon: '📅', label: 'Timeline', price: 79, desc: 'Your story' },
+            { id: 'feature_quiz', icon: '❓', label: 'Quiz', price: 59, desc: 'Fun questions' },
+            { id: 'feature_gift', icon: '🎁', label: 'Gift', price: 89, desc: 'Surprise reveal' },
+            { id: 'feature_countdown', icon: '⏳', label: 'Timer', price: 39, desc: 'Countdown' },
+            { id: 'feature_password', icon: '🔐', label: 'Lock', price: 29, desc: 'PIN protect' },
+            { id: 'feature_scratch', icon: '🎟️', label: 'Scratch', price: 99, desc: 'Scratch reveal' },
+            { id: 'feature_spin', icon: '🎰', label: 'Spin', price: 119, desc: 'Fortune wheel' },
+            { id: 'feature_memory', icon: '🃏', label: 'Memory', price: 109, desc: 'Card game' },
+            { id: 'feature_video', icon: '🎬', label: 'Video', price: 149, desc: 'Video message' },
+            { id: 'feature_confetti', icon: '🎊', label: 'Confetti', price: 49, desc: 'Party burst' }
+        ];
+
+
+        const THEMES = [
+            { id: 'cosmic', name: 'Cosmic Love', emoji: '🪐', bg: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)', accent: '#a855f7' },
+            { id: 'bloom', name: 'Bloom Garden', emoji: '🌸', bg: 'linear-gradient(135deg, #fce4ec, #f8bbd9, #f48fb1)', accent: '#e91e63' },
+            { id: 'neon', name: 'Neon Love', emoji: '💜', bg: 'linear-gradient(135deg, #0a0a0a, #1a0a2e, #16003b)', accent: '#d946ef' },
+            { id: 'classic', name: 'Classic Romance', emoji: '🕯️', bg: 'linear-gradient(135deg, #3e2723, #5d4037, #4e342e)', accent: '#ffab91' },
+            { id: 'minimal', name: 'Minimalist', emoji: '⚪', bg: 'linear-gradient(135deg, #fafafa, #f5f5f5, #eeeeee)', accent: '#f43f5e' },
+            { id: 'starlight', name: 'Starlight', emoji: '✨', bg: 'linear-gradient(135deg, #0c1445, #1a237e, #283593)', accent: '#7c4dff' },
+            { id: 'sunset', name: 'Sunset Glow', emoji: '🌅', bg: 'linear-gradient(135deg, #fff7ed, #fed7aa, #fb923c)', accent: '#f97316' },
+            { id: 'ocean', name: 'Ocean Breeze', emoji: '🌊', bg: 'linear-gradient(135deg, #f0f9ff, #bae6fd, #0ea5e9)', accent: '#0ea5e9' },
+            { id: 'midnight', name: 'Midnight Moon', emoji: '🌙', bg: 'linear-gradient(135deg, #1e1b4b, #312e81, #4338ca)', accent: '#818cf8' },
+            { id: 'aurora', name: 'Aurora Lights', emoji: '🌌', bg: 'linear-gradient(135deg, #0f172a, #22d3ee, #f472b6)', accent: '#22d3ee' }
+        ];
+
+
+        const COLORS = [
+            { id: 'rose', color: '#f43f5e', name: 'Rose' },
+            { id: 'pink', color: '#ec4899', name: 'Pink' },
+            { id: 'purple', color: '#a855f7', name: 'Purple' },
+            { id: 'violet', color: '#8b5cf6', name: 'Violet' },
+            { id: 'gold', color: '#f59e0b', name: 'Gold' },
+            { id: 'red', color: '#ef4444', name: 'Red' }
+        ];
+
+        const FONTS = [
+            { id: 'playfair', name: 'Playfair Display', preview: 'Romantic', style: 'serif' },
+            { id: 'dancing', name: 'Dancing Script', preview: 'Elegant', style: 'cursive' },
+            { id: 'inter', name: 'Inter', preview: 'Modern', style: 'sans-serif' },
+            { id: 'cinzel', name: 'Cinzel', preview: 'Classic', style: 'serif' }
+        ];
+
+        const TEMPLATES = [
+            {
+                id: 'romantic', icon: '💕', name: 'Classic Romance',
+                desc: 'Elegant and heartfelt with soft animations',
+                config: {
+                    message: "My dearest love,\n\nEvery moment with you is a treasure. You are my everything.\n\nForever yours.",
+                    theme: 'classic',
+                    features: ['feature_gallery', 'feature_timeline', 'feature_music'],
+                    timeline: [
+                        { date: "When We Met", title: "Love at First Sight", description: "The moment our eyes met, I knew you were special." },
+                        { date: "Our First Date", title: "Magic Happened", description: "Coffee, laughter, and endless conversation." },
+                        { date: "Today", title: "Still Falling", description: "Every day I fall more in love with you." }
+                    ]
+                }
+            },
+            {
+                id: 'playful', icon: '🎉', name: 'Playful Fun',
+                desc: 'Bright colors and bouncy animations',
+                config: {
+                    message: "Hey you! 😊\n\nYou make every day an adventure. Let's create more memories together!\n\nLove you tons!",
+                    theme: 'bloom',
+                    features: ['feature_gallery', 'feature_quiz', 'feature_gift'],
+                    quiz: { question: "What's my favorite thing about you?", options: ["Your smile", "Your laugh", "Your hugs", "Everything!"], correctIndex: 3 }
+                }
+            },
+            {
+                id: 'minimal', icon: '✨', name: 'Elegant Minimal',
+                desc: 'Clean design with subtle touches',
+                config: {
+                    message: "To my love,\n\nSimple words cannot express how I feel. You complete me.\n\nAlways.",
+                    theme: 'minimal',
+                    features: ['feature_gallery', 'feature_countdown']
+                }
+            },
+            {
+                id: 'poetic', icon: '📜', name: 'Poetic Soul',
+                desc: 'Literary style with beautiful prose',
+                config: {
+                    message: "My Beloved,\n\nLike the stars that paint the midnight sky, your love illuminates my world. In the garden of my heart, you are the most beautiful flower.\n\nEternally yours.",
+                    theme: 'starlight',
+                    features: ['feature_timeline', 'feature_music', 'feature_countdown'],
+                    timeline: [
+                        { date: "Chapter 1", title: "Destiny's Meeting", description: "Two souls destined to find each other." },
+                        { date: "Chapter 2", title: "Growing Together", description: "Through every season, our love bloomed." },
+                        { date: "Chapter 3", title: "Forever After", description: "The story continues, written by us." }
+                    ]
+                }
+            },
+            {
+                id: 'cosmic', icon: '🪐', name: 'Cosmic Adventure',
+                desc: 'Dark mode with magical particles',
+                config: {
+                    message: "You are my universe,\n\nIn the vastness of space, I found you. My star, my moon, my everything.\n\nAcross galaxies, I'd find you again.",
+                    theme: 'cosmic',
+                    features: ['feature_gallery', 'feature_timeline', 'feature_quiz', 'feature_gift']
+                }
+            },
+            {
+                id: 'neon', icon: '💜', name: 'Cyberpunk Love',
+                desc: 'Futuristic with neon vibes',
+                config: {
+                    message: "[LOVE.EXE INITIATED]\n\nYou've hacked my heart.\nNo firewall can stop my feelings.\n\n[STATUS: FOREVER YOURS]",
+                    theme: 'neon',
+                    features: ['feature_gallery', 'feature_quiz', 'feature_gift', 'feature_password']
+                }
+            }
+        ];
+
+
+        function App() {
+            const [activeSection, setActiveSection] = useState('themes');
+            const [mode, setMode] = useState('desktop');
+            const [orientation, setOrientation] = useState('portrait');
+            const [loading, setLoading] = useState(true);
+            const [orderData, setOrderData] = useState(null);
+            const [selectedFeatures, setSelectedFeatures] = useState(['feature_gallery', 'feature_timeline']);
+            const [currentTheme, setCurrentTheme] = useState('cosmic');
+            const [accentColor, setAccentColor] = useState('rose');
+            const [selectedFont, setSelectedFont] = useState('playfair');
+            const [animationLevel, setAnimationLevel] = useState(2);
+
+            // Pro Features State
+            const [zoomLevel, setZoomLevel] = useState(100);
+            const [soundEnabled, setSoundEnabled] = useState(true);
+            const [autoSaveStatus, setAutoSaveStatus] = useState('saved');
+            const [history, setHistory] = useState([]);
+            const [historyIndex, setHistoryIndex] = useState(-1);
+
+            // V16 Smart Features State
+            const [aiModalOpen, setAiModalOpen] = useState(false);
+            const [isRecording, setIsRecording] = useState(false);
+            const [mediaRecorder, setMediaRecorder] = useState(null);
+
+            // V17 UI State
+            const [darkMode, setDarkMode] = useState(true);
+
+            // Calculate progress
+            const calculateProgress = () => {
+                let filled = 0;
+                let total = 6;
+                if (config.partnerName) filled++;
+                if (config.senderName) filled++;
+                if (config.message.length > 20) filled++;
+                if (config.gallery.length > 0) filled++;
+                if (config.timeline.length > 0) filled++;
+                if (selectedFeatures.length > 0) filled++;
+                return Math.round((filled / total) * 100);
+            };
+
+
+            const generateLoveLetter = (mood) => {
+                const name = config.partnerName || 'my love';
+                const sender = config.senderName || 'Me';
+                const messages = {
+                    romantic: `My dearest ${name},\n\nEvery day with you feels like a dream I never want to wake up from. You are the beat in my heart and the light in my life.\n\nForever yours,\n${sender}`,
+                    funny: `Hey ${name}!\n\nI love you more than pizza (and that's saying a lot!). Thanks for putting up with my bad jokes and stealing my hoodies.\n\nLove,\n${sender}`,
+                    poetic: `To ${name},\n\nLike the stars guide the night, your love guides my soul. In this vast universe, finding you was my greatest destiny.\n\nEternally,\n${sender}`,
+                    short: `${name}, you make my heart smile. Happy Valentine's Day! ❤️\n\n- ${sender}`
+                };
+                setConfig({ ...config, message: messages[mood] });
+                setAiModalOpen(false);
+                setAutoSaveStatus('saved');
+            };
+
+            const toggleRecording = async () => {
+                if (isRecording) {
+                    mediaRecorder?.stop();
+                    setIsRecording(false);
+                } else {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        const recorder = new MediaRecorder(stream);
+                        const chunks = [];
+                        recorder.ondataavailable = e => chunks.push(e.data);
+                        recorder.onstop = () => {
+                            const blob = new Blob(chunks, { type: 'audio/mp3' });
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                setConfig({ ...config, musicUrl: e.target.result });
+                                setAutoSaveStatus('saved');
+                            };
+                            reader.readAsDataURL(blob);
+                            stream.getTracks().forEach(track => track.stop());
+                        };
+                        recorder.start();
+                        setMediaRecorder(recorder);
+                        setIsRecording(true);
+                    } catch (e) { alert("Microphone access denied or not supported."); }
+                }
+            };
+
+
+            const [config, setConfig] = useState({
+                senderName: '', partnerName: '', message: 'My dearest...',
+                musicUrl: 'https://res.cloudinary.com/dncywqfpb/video/upload/v1738399057/music_qzh0xk.mp3',
+                giftUrl: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48',
+                timeline: [
+                    { date: "2023", title: "We Met", description: "The stars aligned." },
+                    { date: "2024", title: "First Date", description: "Coffee and endless talks." }
+                ],
+                quiz: { question: "Where was our first date?", options: ["Cafe", "Park", "Cinema", "Beach"], correctIndex: 0 },
+                gallery: [
+                    "https://images.unsplash.com/photo-1518199266791-5375a83190b7",
+                    "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2",
+                    "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70"
+                ],
+                countdown: { enabled: false, date: "2026-02-14" },
+                password: "",
+                effects: { hearts: false, sparkles: false, bubbles: false }
+            });
+
+            const [deviceFrame, setDeviceFrame] = useState('iphone');
+
+            const iframeRef = useRef(null);
+            const previewUrl = `http://localhost:3000/templates/${currentTheme}/index.html`;
+            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(previewUrl)}`;
+
+            useEffect(() => {
+                const send = () => iframeRef.current?.contentWindow?.postMessage({
+                    type: 'UPDATE_CONFIG',
+                    payload: {
+                        ...config,
+                        features: selectedFeatures,
+                        accentColor: COLORS.find(c => c.id === accentColor)?.color,
+                        fontFamily: FONTS.find(f => f.id === selectedFont)?.name,
+                        animationLevel
+                    }
+                }, '*');
+                send();
+                const interval = setInterval(send, 2000);
+                return () => clearInterval(interval);
+            }, [config, selectedFeatures, accentColor, selectedFont, animationLevel]);
+
+            // Keyboard shortcuts
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if (e.metaKey || e.ctrlKey) {
+                        if (e.key === 'p') { e.preventDefault(); setMode(m => m === 'desktop' ? 'mobile' : 'desktop'); }
+                        if (e.key === 's') { e.preventDefault(); handleCheckout(); }
+                    }
+                };
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, []);
+
+            const themePrice = 199;
+            const featurePrice = selectedFeatures.reduce((sum, fid) => (FEATURES.find(f => f.id === fid)?.price || 0) + sum, 0);
+            const totalPrice = themePrice + featurePrice;
+
+            // UPI Payment State
+            const [upiModal, setUpiModal] = useState(null);
+
+            const handleCheckout = async () => {
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#f43f5e', '#a855f7', '#fb7185'] });
+                try {
+                    const res = await fetch('/api/create-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            features: selectedFeatures,
+                            theme: currentTheme,
+                            config: config,
+                            customerName: config.senderName || 'Guest',
+                            customerEmail: ''
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.orderId) {
+                        setUpiModal(data); // Show UPI payment modal
+                    } else {
+                        alert('Order failed. Please try again.');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert('Order failed. Please try again.');
+                }
+            };
+
+            const confirmPayment = async (transactionId) => {
+                try {
+                    const res = await fetch('/api/confirm-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            orderId: upiModal.orderId,
+                            transactionId
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        setOrderData({ orderId: data.orderId, success: true });
+                        setUpiModal(null);
+                    }
+                } catch (e) {
+                    alert('Confirmation failed');
+                }
+            };
+
+
+
+            const toggleFeature = (id) => setSelectedFeatures(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
+            const updateTimeline = (i, field, val) => { const t = [...config.timeline]; t[i][field] = val; setConfig({ ...config, timeline: t }); };
+            const updateGallery = (i, val) => { const g = [...config.gallery]; g[i] = val; setConfig({ ...config, gallery: g }); };
+
+            // Enhanced applyTemplate - applies theme, features, and config
+            const applyTemplate = (template) => {
+                const { theme, features, ...restConfig } = template.config;
+                if (theme) setCurrentTheme(theme);
+                if (features) setSelectedFeatures(features);
+                setConfig({ ...config, ...restConfig });
+                setAutoSaveStatus('saving');
+                setTimeout(() => setAutoSaveStatus('saved'), 1000);
+            };
+
+            // File Upload Handlers
+            const handlePhotoUpload = (e, index) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const newGallery = [...config.gallery];
+                    if (index !== undefined) {
+                        newGallery[index] = event.target.result;
+                    } else {
+                        newGallery.push(event.target.result);
+                    }
+                    setConfig({ ...config, gallery: newGallery });
+                    setAutoSaveStatus('saving');
+                    setTimeout(() => setAutoSaveStatus('saved'), 500);
+                };
+                reader.readAsDataURL(file);
+            };
+
+            const handleMusicUpload = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    setConfig({ ...config, musicUrl: event.target.result });
+                    setAutoSaveStatus('saving');
+                    setTimeout(() => setAutoSaveStatus('saved'), 500);
+                };
+                reader.readAsDataURL(file);
+            };
+
+            const handleGiftUpload = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    setConfig({ ...config, giftUrl: event.target.result });
+                    setAutoSaveStatus('saving');
+                    setTimeout(() => setAutoSaveStatus('saved'), 500);
+                };
+                reader.readAsDataURL(file);
+            };
+
+            const addGallerySlot = () => {
+                setConfig({ ...config, gallery: [...config.gallery, ''] });
+            };
+
+            const removeGalleryImage = (index) => {
+                const newGallery = config.gallery.filter((_, i) => i !== index);
+                setConfig({ ...config, gallery: newGallery });
+            };
+
+
+            return (
+                <div className={`app-layout ${!activeSection ? 'panel-closed' : ''}`} data-theme={darkMode ? 'dark' : 'light'}>
+                    {/* Gradient Mesh Background */}
+                    <div className="gradient-mesh"></div>
+
+                    {/* Progress Bar */}
+                    <div className="progress-bar">
+                        <div className="progress-fill" style={{ width: `${calculateProgress()}%` }}></div>
+                    </div>
+
+                    {/* SIDEBAR */}
+                    <div className="sidebar">
+                        <div className="sidebar-logo">💘</div>
+                        <div className={`sidebar-item ${activeSection === 'themes' ? 'active' : ''}`} data-tooltip="Themes" onClick={() => setActiveSection('themes')}>🎨</div>
+                        <div className={`sidebar-item ${activeSection === 'content' ? 'active' : ''}`} data-tooltip="Content" onClick={() => setActiveSection('content')}>✍️</div>
+                        <div className={`sidebar-item ${activeSection === 'features' ? 'active' : ''}`} data-tooltip="Features" onClick={() => setActiveSection('features')}>✨</div>
+                        <div className={`sidebar-item ${activeSection === 'gallery' ? 'active' : ''}`} data-tooltip="Gallery" onClick={() => setActiveSection('gallery')}>📸</div>
+                        <div className={`sidebar-item ${activeSection === 'timeline' ? 'active' : ''}`} data-tooltip="Timeline" onClick={() => setActiveSection('timeline')}>📅</div>
+                        <div className="sidebar-divider"></div>
+                        <div className={`sidebar-item ${activeSection === 'style' ? 'active' : ''}`} data-tooltip="Style" onClick={() => setActiveSection('style')}>🎭</div>
+                        <div className={`sidebar-item ${activeSection === 'templates' ? 'active' : ''}`} data-tooltip="Templates" onClick={() => setActiveSection('templates')}>📋</div>
+                        <div className={`sidebar-item ${activeSection === 'settings' ? 'active' : ''}`} data-tooltip="Settings" onClick={() => setActiveSection('settings')}>⚙️</div>
+                        <div className="sidebar-spacer"></div>
+                        <div className="sidebar-item" data-tooltip={darkMode ? 'Light Mode' : 'Dark Mode'} onClick={() => setDarkMode(!darkMode)}>{darkMode ? '🌙' : '☀️'}</div>
+                        <div className="sidebar-item" data-tooltip="Shortcuts" onClick={() => alert('⌘P: Preview Mode\n⌘S: Publish')}>⌨️</div>
+                    </div>
+
+
+                    {/* CANVAS */}
+                    <div className="canvas-area">
+                        <div className="canvas-pattern"></div>
+                        <div className="toolbar">
+                            <button className={`toolbar-btn ${mode === 'desktop' ? 'active' : ''}`} onClick={() => setMode('desktop')}>Desktop</button>
+                            <button className={`toolbar-btn ${mode === 'mobile' ? 'active' : ''}`} onClick={() => setMode('mobile')}>Mobile</button>
+                            {mode === 'mobile' && (
+                                <>
+                                    <div className="toolbar-divider"></div>
+                                    <button className={`toolbar-btn ${orientation === 'portrait' ? 'active' : ''}`} onClick={() => setOrientation('portrait')}>Portrait</button>
+                                    <button className={`toolbar-btn ${orientation === 'landscape' ? 'active' : ''}`} onClick={() => setOrientation('landscape')}>Landscape</button>
+                                </>
+                            )}
+                            <div className="toolbar-divider"></div>
+                            <button className="toolbar-btn" onClick={() => setZoomLevel(Math.max(50, zoomLevel - 25))}>➖</button>
+                            <span style={{ fontSize: '12px', color: '#a1a1aa', minWidth: '45px', textAlign: 'center' }}>{zoomLevel}%</span>
+                            <button className="toolbar-btn" onClick={() => setZoomLevel(Math.min(150, zoomLevel + 25))}>➕</button>
+                            <div className="toolbar-divider"></div>
+                            <button className={`toolbar-btn ${soundEnabled ? 'active' : ''}`} onClick={() => setSoundEnabled(!soundEnabled)} title="Sound Effects">{soundEnabled ? '🔊' : '🔇'}</button>
+                            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ fontSize: '11px', color: autoSaveStatus === 'saved' ? '#22c55e' : '#f59e0b' }}>{autoSaveStatus === 'saved' ? '✓ Saved' : '● Saving...'}</span>
+                            </div>
+                        </div>
+
+                        <div className="preview-container">
+                            {mode === 'desktop' ? (
+                                <div className="preview-desktop">
+                                    {loading && <div style={{ position: 'absolute', inset: 0, background: '#09090b', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}><span className="loader"></span></div>}
+                                    <iframe ref={iframeRef} src={previewUrl} style={{ width: '100%', height: '100%', border: 'none' }} onLoad={() => setTimeout(() => setLoading(false), 500)}></iframe>
+                                </div>
+                            ) : (
+                                <div className={`preview-mobile ${orientation === 'landscape' ? 'landscape' : ''}`}>
+                                    <div className="preview-screen">
+                                        {orientation === 'portrait' && <div className="notch"></div>}
+                                        {loading && <div style={{ position: 'absolute', inset: 0, background: '#09090b', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}><span className="loader"></span></div>}
+                                        <iframe ref={iframeRef} src={previewUrl} style={{ width: '100%', height: '100%', border: 'none' }} onLoad={() => setTimeout(() => setLoading(false), 500)}></iframe>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* RIGHT PANEL */}
+                    {activeSection && (
+                        <div className="right-panel">
+                            <div className="panel-header">
+                                <div>
+                                    <div className="panel-title">
+                                        {activeSection === 'themes' && '🎨 Choose Theme'}
+                                        {activeSection === 'content' && '✍️ Edit Content'}
+                                        {activeSection === 'features' && '✨ Add Features'}
+                                        {activeSection === 'gallery' && '📸 Photo Gallery'}
+                                        {activeSection === 'timeline' && '📅 Our Story'}
+                                        {activeSection === 'style' && '🎭 Customize Style'}
+                                        {activeSection === 'templates' && '📋 Quick Templates'}
+                                        {activeSection === 'settings' && '⚙️ Settings'}
+                                    </div>
+                                    <div className="panel-subtitle">
+                                        {activeSection === 'themes' && '6 premium themes available'}
+                                        {activeSection === 'style' && 'Colors, fonts & animations'}
+                                        {activeSection === 'templates' && 'One-click setup'}
+                                    </div>
+                                </div>
+                                <button className="panel-close" onClick={() => setActiveSection(null)}>✕</button>
+                            </div>
+                            <div className="panel-body">
+
+                                {/* THEMES SECTION */}
+                                {activeSection === 'themes' && (
+                                    <div className="theme-grid">
+                                        {THEMES.map(theme => (
+                                            <div key={theme.id} className={`theme-card ${currentTheme === theme.id ? 'active' : ''}`} onClick={() => setCurrentTheme(theme.id)}>
+                                                <div className="theme-card-bg" style={{ background: theme.bg }}></div>
+                                                <div className="theme-card-info">
+                                                    <span className="theme-card-name">{theme.emoji} {theme.name}</span>
+                                                </div>
+                                                {currentTheme === theme.id && <div className="theme-card-badge">Active</div>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* CONTENT SECTION */}
+                                {activeSection === 'content' && (
+                                    <>
+                                        <div className="form-group">
+                                            <label className="form-label">❤️ Partner's Name</label>
+                                            <input className="form-input" value={config.partnerName} onChange={e => setConfig({ ...config, partnerName: e.target.value })} placeholder="Their name" />
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">💌 Your Name</label>
+                                            <input className="form-input" value={config.senderName} onChange={e => setConfig({ ...config, senderName: e.target.value })} placeholder="Your name" />
+                                        </div>
+                                        <div className="form-group">
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                                                <label className="form-label" style={{ margin: 0 }}>💕 Love Letter</label>
+                                                <button onClick={() => setAiModalOpen(true)} style={{ fontSize: 12, padding: '6px 14px', background: 'linear-gradient(135deg,#6366f1,#a855f7)', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>✨ AI Magic Write</button>
+                                            </div>
+                                            <textarea className="form-input form-textarea" value={config.message} onChange={e => setConfig({ ...config, message: e.target.value })}></textarea>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* FEATURES SECTION */}
+                                {activeSection === 'features' && (
+                                    <>
+                                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>Select features to include in your Valentine's page.</p>
+                                        <div className="feature-grid">
+                                            {FEATURES.map(f => (
+                                                <div key={f.id} className={`feature-item ${selectedFeatures.includes(f.id) ? 'active' : ''}`} onClick={() => toggleFeature(f.id)}>
+                                                    <div className="icon">{f.icon}</div>
+                                                    <div className="name">{f.label}</div>
+                                                    <div className="price">₹{f.price}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Music Upload */}
+                                        {selectedFeatures.includes('feature_music') && (
+                                            <div className="card" style={{ marginTop: 20, padding: 16 }}>
+                                                <div className="form-label">🎵 Background Music</div>
+                                                <input className="form-input" style={{ marginBottom: 10 }} value={config.musicUrl} onChange={(e) => setConfig({ ...config, musicUrl: e.target.value })} placeholder="Paste music URL..." />
+                                                <div style={{ display: 'flex', gap: 10 }}>
+                                                    <label style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', background: 'var(--bg-primary)', border: '1px dashed var(--border)', borderRadius: 10, cursor: 'pointer', color: 'var(--accent)', fontSize: 12 }}>
+                                                        <input type="file" accept="audio/*" style={{ display: 'none' }} onChange={handleMusicUpload} />
+                                                        📤 Upload
+                                                    </label>
+                                                    <button onClick={toggleRecording} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', background: isRecording ? '#ef4444' : 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 10, cursor: 'pointer', color: isRecording ? 'white' : 'var(--accent)', fontSize: 12 }}>
+                                                        {isRecording ? '⏹ Stop' : '🎤 Record Voice'}
+                                                    </button>
+                                                </div>
+                                                {config.musicUrl && config.musicUrl.startsWith('data:') && <p style={{ fontSize: 11, color: '#22c55e', marginTop: 8 }}>✓ Audio loaded</p>}
+                                            </div>
+                                        )}
+
+                                        {/* Gift Upload */}
+                                        {selectedFeatures.includes('feature_gift') && (
+                                            <div className="card" style={{ marginTop: 12, padding: 16 }}>
+                                                <div className="form-label">🎁 Gift Image</div>
+                                                <input className="form-input" style={{ marginBottom: 10 }} value={config.giftUrl} onChange={(e) => setConfig({ ...config, giftUrl: e.target.value })} placeholder="Paste gift image URL..." />
+                                                <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 16px', background: 'var(--bg-primary)', border: '1px dashed var(--border)', borderRadius: 10, cursor: 'pointer', color: 'var(--accent)', fontSize: 13 }}>
+                                                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleGiftUpload} />
+                                                    📤 Upload Gift Image
+                                                </label>
+                                                {config.giftUrl && <div style={{ marginTop: 10, borderRadius: 10, overflow: 'hidden', maxWidth: 120 }}><img src={config.giftUrl} style={{ width: '100%', height: 80, objectFit: 'cover' }} /></div>}
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+
+
+                                {/* GALLERY SECTION */}
+                                {activeSection === 'gallery' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Upload photos from your device or paste URLs</p>
+                                        {config.gallery.map((url, i) => (
+                                            <div key={i} className="card" style={{ display: 'flex', gap: 12, alignItems: 'center', padding: 12 }}>
+                                                <div style={{ width: 60, height: 60, borderRadius: 10, background: '#1a1a1a', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
+                                                    {url && <img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                                                    {!url && <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: 20 }}>📷</span>}
+                                                </div>
+                                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                                    <input className="form-input" style={{ marginBottom: 0, fontSize: 12 }} value={url} onChange={e => updateGallery(i, e.target.value)} placeholder="Paste image URL..." />
+                                                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--accent)', cursor: 'pointer' }}>
+                                                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e, i)} />
+                                                        📤 Upload from device
+                                                    </label>
+                                                </div>
+                                                <button style={{ width: 32, height: 32, borderRadius: 8, background: 'transparent', border: '1px solid var(--border)', color: '#ef4444', cursor: 'pointer', fontSize: 16 }} onClick={() => removeGalleryImage(i)}>×</button>
+                                            </div>
+                                        ))}
+                                        <div style={{ display: 'flex', gap: 10 }}>
+                                            <button className="btn-secondary" style={{ flex: 1 }} onClick={addGallerySlot}>+ Add Photo Slot</button>
+                                            <label className="btn-secondary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                                                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e)} />
+                                                📤 Upload New
+                                            </label>
+                                        </div>
+                                    </div>
+                                )}
+
+
+                                {/* TIMELINE SECTION */}
+                                {activeSection === 'timeline' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                        {config.timeline.map((item, i) => (
+                                            <div key={i} className="card">
+                                                <div className="form-group" style={{ marginBottom: 12 }}><input className="form-input" value={item.title} onChange={e => updateTimeline(i, 'title', e.target.value)} placeholder="Event title" /></div>
+                                                <div className="form-group" style={{ marginBottom: 12 }}><input className="form-input" value={item.date} onChange={e => updateTimeline(i, 'date', e.target.value)} placeholder="Date" /></div>
+                                                <textarea className="form-input" style={{ minHeight: 70, resize: 'none' }} value={item.description} onChange={e => updateTimeline(i, 'description', e.target.value)} placeholder="Description..."></textarea>
+                                            </div>
+                                        ))}
+                                        <button className="btn-secondary" onClick={() => setConfig({ ...config, timeline: [...config.timeline, { date: "Year", title: "New Event", description: "..." }] })}>+ Add Event</button>
+                                    </div>
+                                )}
+
+                                {/* STYLE SECTION */}
+                                {activeSection === 'style' && (
+                                    <>
+                                        <div className="form-group">
+                                            <label className="form-label">🎨 Accent Color</label>
+                                            <div className="color-grid">
+                                                {COLORS.map(c => (
+                                                    <div key={c.id} className={`color-swatch ${accentColor === c.id ? 'active' : ''}`} style={{ background: c.color }} onClick={() => setAccentColor(c.id)} title={c.name}></div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">🔤 Font Style</label>
+                                            {FONTS.map(f => (
+                                                <div key={f.id} className={`font-option ${selectedFont === f.id ? 'active' : ''}`} onClick={() => setSelectedFont(f.id)}>
+                                                    <span className="font-preview" style={{ fontFamily: f.style }}>{f.preview}</span>
+                                                    <span className="font-name">{f.name}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">✨ Animation Intensity</label>
+                                            <div className="slider-container">
+                                                <input type="range" className="slider" min="1" max="3" value={animationLevel} onChange={e => setAnimationLevel(parseInt(e.target.value))} />
+                                                <div className="slider-labels">
+                                                    <span>Subtle</span>
+                                                    <span>Medium</span>
+                                                    <span>Maximum</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* TEMPLATES SECTION */}
+                                {activeSection === 'templates' && (
+                                    <div className="template-grid">
+                                        {TEMPLATES.map(t => (
+                                            <div key={t.id} className="template-card" onClick={() => applyTemplate(t)}>
+                                                <div className="template-card-header">
+                                                    <span className="template-card-icon">{t.icon}</span>
+                                                    <span className="template-card-title">{t.name}</span>
+                                                </div>
+                                                <p className="template-card-desc">{t.desc}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* SETTINGS SECTION */}
+                                {activeSection === 'settings' && (
+                                    <>
+                                        {/* Animation Effects */}
+                                        <div className="form-group">
+                                            <label className="form-label">✨ Animation Effects</label>
+                                            <div className="effects-grid">
+                                                <div className={`effect-item ${config.effects?.hearts ? 'active' : ''}`} onClick={() => setConfig({ ...config, effects: { ...config.effects, hearts: !config.effects?.hearts } })}>
+                                                    <span className="icon">💕</span>
+                                                    <span>Hearts</span>
+                                                </div>
+                                                <div className={`effect-item ${config.effects?.sparkles ? 'active' : ''}`} onClick={() => setConfig({ ...config, effects: { ...config.effects, sparkles: !config.effects?.sparkles } })}>
+                                                    <span className="icon">✨</span>
+                                                    <span>Sparkles</span>
+                                                </div>
+                                                <div className={`effect-item ${config.effects?.bubbles ? 'active' : ''}`} onClick={() => setConfig({ ...config, effects: { ...config.effects, bubbles: !config.effects?.bubbles } })}>
+                                                    <span className="icon">🫧</span>
+                                                    <span>Bubbles</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Password Lock */}
+                                        <div className="form-group">
+                                            <label className="form-label">🔐 Password Lock</label>
+                                            <input type="password" className="form-input" style={{ textAlign: 'center', letterSpacing: '0.4em', fontSize: 20 }} value={config.password} onChange={e => setConfig({ ...config, password: e.target.value })} placeholder="••••" maxLength={6} />
+                                        </div>
+
+                                        {/* Share & Export */}
+                                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 24, marginTop: 12 }}>
+                                            <label className="form-label">📤 Share & Export</label>
+                                            <div className="share-buttons" style={{ marginBottom: 12 }}>
+                                                <button className="share-btn whatsapp" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('Check out my Valentine! ' + previewUrl)}`)}>
+                                                    💬 WhatsApp
+                                                </button>
+                                                <button className="share-btn copy" onClick={() => { navigator.clipboard.writeText(previewUrl); alert('Link copied!'); }}>
+                                                    📋 Copy
+                                                </button>
+                                            </div>
+                                            <button className="share-btn download" style={{ width: '100%' }} onClick={() => alert('Download feature coming soon!')}>
+                                                📥 Download as Image
+                                            </button>
+                                        </div>
+
+                                        {/* QR Code */}
+                                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 24, marginTop: 24 }}>
+                                            <label className="form-label">📱 Share via QR</label>
+                                            <div style={{ background: 'white', padding: 20, borderRadius: 16, display: 'flex', justifyContent: 'center' }}><img src={qrCodeUrl} style={{ width: 140, height: 140 }} /></div>
+                                            <p style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', marginTop: 12, wordBreak: 'break-all' }}>{previewUrl}</p>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+
+                            <div className="publish-area">
+                                <button className="btn-primary" onClick={handleCheckout}>
+                                    🚀 Publish — ₹{totalPrice}
+                                </button>
+                                <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 12 }}>
+                                    <span className="kbd">⌘S</span>
+                                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>to publish</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* MODAL */}
+                    <div className={`modal-backdrop ${orderData ? 'open' : ''}`}>
+                        <div className="modal-card">
+                            <div style={{ fontSize: 56, marginBottom: 20 }}>🎉</div>
+                            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Order Confirmed!</h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 24 }}>Your Valentine's page is ready to launch.</p>
+                            <div style={{ background: 'var(--bg-primary)', padding: 20, borderRadius: 14, marginBottom: 24, border: '1px solid var(--border)' }}>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>ORDER ID</div>
+                                <div style={{ fontFamily: 'monospace', fontSize: 22, color: 'var(--accent-purple)' }}>{orderData?.orderId}</div>
+                            </div>
+                            <button className="btn-primary" onClick={() => setOrderData(null)}>Continue Editing</button>
+                        </div>
+                    </div>
+
+                    {/* AI MODAL */}
+                    <div className={`modal-backdrop ${aiModalOpen ? 'open' : ''}`} onClick={(e) => e.target.className.includes('modal-backdrop') && setAiModalOpen(false)}>
+                        <div className="modal-card">
+                            <div style={{ fontSize: 48, marginBottom: 16 }}>✨</div>
+                            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Magic Writer</h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 24 }}>Select a mood for your love letter.</p>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+                                {['Romantic', 'Funny', 'Poetic', 'Short'].map(m => (
+                                    <button key={m} className="btn-secondary" onClick={() => generateLoveLetter(m.toLowerCase())} style={{ padding: 12 }}>{m}</button>
+                                ))}
+                            </div>
+                            <button className="btn-no" style={{ width: '100%', padding: 12, border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }} onClick={() => setAiModalOpen(false)}>Cancel</button>
+                        </div>
+                    </div>
+
+                    {/* UPI PAYMENT MODAL */}
+                    {upiModal && (
+                        <div className="modal-backdrop open" onClick={(e) => e.target.className.includes('modal-backdrop') && setUpiModal(null)}>
+                            <div className="modal-card" style={{ maxWidth: 400 }}>
+                                <div style={{ fontSize: 48, marginBottom: 16 }}>💳</div>
+                                <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Pay with UPI</h2>
+                                <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 16 }}>Scan QR or use UPI ID to pay</p>
+
+                                <div style={{ background: 'white', padding: 16, borderRadius: 16, marginBottom: 16 }}>
+                                    <img src={upiModal.qrUrl} alt="UPI QR" style={{ width: '100%', maxWidth: 180, margin: '0 auto', display: 'block' }} />
+                                </div>
+
+                                <div style={{ background: 'var(--bg-tertiary)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
+                                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>Amount</div>
+                                    <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--accent)' }}>₹{upiModal.amount}</div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>
+                                        UPI ID: <strong style={{ color: 'var(--text-secondary)' }}>{upiModal.upiId}</strong>
+                                    </div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+                                        Order: <strong style={{ color: 'var(--accent-purple)' }}>{upiModal.orderId}</strong>
+                                    </div>
+                                </div>
+
+                                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>After payment, enter your UPI Transaction ID:</p>
+                                <input
+                                    id="txnInput"
+                                    className="form-input"
+                                    placeholder="e.g. 401234567890"
+                                    style={{ marginBottom: 12, textAlign: 'center', letterSpacing: '0.05em' }}
+                                />
+                                <button
+                                    className="btn-primary"
+                                    onClick={() => {
+                                        const txn = document.getElementById('txnInput').value;
+                                        if (txn.length > 5) confirmPayment(txn);
+                                        else alert('Please enter valid Transaction ID');
+                                    }}
+                                >
+                                    ✅ I've Paid - Confirm
+                                </button>
+                                <button
+                                    style={{ width: '100%', padding: 12, border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', marginTop: 8 }}
+                                    onClick={() => setUpiModal(null)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+
+                    {/* FLOATING BOTTOM ACTION BAR */}
+                    <div className="bottom-action-bar">
+                        <div className="live-badge">
+                            <div className="live-dot"></div>
+                            Editing
+                        </div>
+                        <div className="action-divider"></div>
+                        <button className="action-btn" title="Undo">↩️ Undo</button>
+                        <button className="action-btn" title="Redo">↪️ Redo</button>
+                        <div className="action-divider"></div>
+                        <button className="action-btn" onClick={() => setMode(mode === 'desktop' ? 'mobile' : 'desktop')}>
+                            {mode === 'desktop' ? '📱' : '🖥️'} {mode === 'desktop' ? 'Mobile' : 'Desktop'}
+                        </button>
+                        <button className="action-btn primary" onClick={handleCheckout}>
+                            🚀 Publish — ₹{totalPrice}
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+
+</html>

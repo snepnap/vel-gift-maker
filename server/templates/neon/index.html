@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Love 💜</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <audio id="bgMusic" loop>
+        <source src="" type="audio/mp3">
+    </audio>
+    <button id="musicToggle" class="music-btn">🎵</button>
+
+    <!-- Neon Grid Background -->
+    <div class="neon-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glow-orbs"></div>
+
+    <!-- HERO -->
+    <section id="hero" class="section">
+        <div class="hero-content">
+            <div class="glitch" data-text="LOVE.EXE">LOVE.EXE</div>
+            <h1 class="hero-title">
+                <span class="neon-text pink">SYSTEM:</span>
+                <span class="neon-text purple">ACTIVATED</span>
+            </h1>
+            <p class="hero-subtitle">Initiating love protocol...</p>
+            <button class="btn-neon" id="start-btn">
+                <span class="btn-inner">&gt; ENTER_</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery-section" class="section hidden-section">
+        <div class="terminal-header">$ display memories --all</div>
+        <div class="gallery-grid" id="gallery"></div>
+        <button class="btn-neon" id="next-to-letter"><span class="btn-inner">&gt; READ_MESSAGE_</span></button>
+    </section>
+
+    <!-- LETTER -->
+    <section id="letter-section" class="section hidden-section">
+        <div class="letter-terminal">
+            <div class="terminal-bar"><span class="dot red"></span><span class="dot yellow"></span><span
+                    class="dot green"></span><span class="terminal-title">love_letter.txt</span></div>
+            <div class="terminal-content">
+                <div class="terminal-line"><span class="prompt">$</span> cat message</div>
+                <h2 id="letter-title" class="letter-heading">&gt; To: My Love</h2>
+                <p id="letter-body" class="letter-text">...</p>
+                <div class="terminal-line"><span class="prompt">$</span> signed_by <span class="value"
+                        id="sender-name">Anonymous</span></div>
+            </div>
+        </div>
+        <button class="btn-neon" id="next-to-timeline"><span class="btn-inner">&gt; VIEW_TIMELINE_</span></button>
+    </section>
+
+    <!-- TIMELINE -->
+    <section id="timeline-section" class="section hidden-section">
+        <div class="terminal-header">$ git log --love</div>
+        <div class="timeline-grid" id="timeline"></div>
+        <button class="btn-neon" id="next-to-quiz"><span class="btn-inner">&gt; RUN_QUIZ_</span></button>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz-section" class="section hidden-section">
+        <div class="terminal-header">$ ./quiz.sh</div>
+        <h2 id="quiz-question" class="quiz-title">Loading question...</h2>
+        <div class="quiz-grid" id="quiz-options"></div>
+        <button class="btn-neon hidden" id="next-to-gift"><span class="btn-inner">&gt; UNLOCK_GIFT_</span></button>
+    </section>
+
+    <!-- GIFT -->
+    <section id="gift-section" class="section hidden-section">
+        <div class="terminal-header">$ decrypt gift.enc</div>
+        <div class="gift-box" id="gift-box">
+            <div class="gift-icon">📦</div>
+            <div class="gift-loader">DECRYPTING...</div>
+        </div>
+        <div id="gift-content" class="hidden">
+            <img id="gift-image" src="" alt="Gift">
+            <p id="gift-message" class="neon-text pink"></p>
+        </div>
+        <button class="btn-neon hidden" id="next-to-finale"><span class="btn-inner">&gt; FINAL_PROMPT_</span></button>
+    </section>
+
+    <!-- FINALE -->
+    <section id="finale-section" class="section hidden-section">
+        <div class="finale-content">
+            <div class="heart-icon">💜</div>
+            <h1 class="finale-question neon-text purple" id="question-text">WILL_YOU_BE_MY_VALENTINE?</h1>
+            <div class="finale-buttons">
+                <button id="yes-btn" class="btn-yes">&gt; YES 💕</button>
+                <button id="no-btn" class="btn-no">&gt; NO</button>
+            </div>
+            <div id="success-message" class="hidden">
+                <div class="success-icon">💜</div>
+                <h1 class="glitch neon-text pink" data-text="ACCESS GRANTED">ACCESS GRANTED</h1>
+                <p class="success-sub">Love protocol: SUCCESS</p>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

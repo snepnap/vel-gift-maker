@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Love 🌊</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <audio id="bgMusic" loop>
+        <source src="" type="audio/mp3">
+    </audio>
+    <button id="musicToggle" class="music-btn">🎵</button>
+    <div class="waves"></div>
+    <section id="hero" class="section">
+        <div class="hero-content">
+            <div class="wave-icon">🌊</div>
+            <h1>Deeper Than The Ocean</h1>
+            <p>My love for you knows no bounds</p>
+            <button class="btn-ocean" id="start-btn">Dive In 💙</button>
+        </div>
+    </section>
+    <section id="gallery-section" class="section hidden-section">
+        <h2>Waves of Memories</h2>
+        <div class="gallery-grid" id="gallery"></div>
+        <button class="btn-ocean" id="next-to-letter">Next →</button>
+    </section>
+    <section id="letter-section" class="section hidden-section">
+        <div class="letter-card">
+            <h2 id="letter-title">My Ocean,</h2>
+            <p id="letter-body">...</p>
+            <div class="sig">— <span id="sender-name">Me</span></div>
+        </div>
+        <button class="btn-ocean" id="next-to-timeline">Continue →</button>
+    </section>
+    <section id="timeline-section" class="section hidden-section">
+        <h2>Our Voyage</h2>
+        <div class="timeline" id="timeline"></div>
+        <button class="btn-ocean" id="next-to-quiz">Quiz →</button>
+    </section>
+    <section id="quiz-section" class="section hidden-section">
+        <h2 id="quiz-question">Question</h2>
+        <div class="quiz-grid" id="quiz-options"></div>
+        <button class="btn-ocean hidden" id="next-to-gift">Gift →</button>
+    </section>
+    <section id="gift-section" class="section hidden-section">
+        <h2>Treasure From The Deep</h2>
+        <div class="gift-box" id="gift-box"><span>🐚</span></div>
+        <div id="gift-content" class="hidden"><img id="gift-image" src="">
+            <p id="gift-message"></p>
+        </div>
+        <button class="btn-ocean hidden" id="next-to-finale">Continue →</button>
+    </section>
+    <section id="finale-section" class="section hidden-section">
+        <div class="finale-content">
+            <h1 id="question-text">Sail Into Forever With Me?</h1>
+            <div class="finale-buttons">
+                <button id="yes-btn" class="btn-yes">Yes! 🌊</button>
+                <button id="no-btn" class="btn-no">No</button>
+            </div>
+            <div id="success-message" class="hidden">
+                <h1>You're My Anchor! 💙</h1>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <audio id="bgMusic" loop>
+        <source src="" type="audio/mp3">
+    </audio>
+    <button id="musicToggle" class="music-btn">🎵</button>
+    <canvas id="stars"></canvas>
+    <div class="shooting-stars"></div>
+    <section id="hero" class="section">
+        <div class="hero-content">
+            <div class="star-icon">✨</div>
+            <h1 class="hero-title">Written in the Stars</h1>
+            <p class="hero-subtitle">A message from across the universe</p>
+            <button class="btn-star" id="start-btn">Begin Journey ✨</button>
+        </div>
+    </section>
+    <section id="gallery-section" class="section hidden-section">
+        <div class="section-header">
+            <h2>Constellation of Memories</h2>
+        </div>
+        <div class="gallery-grid" id="gallery"></div>
+        <button class="btn-star" id="next-to-letter">Read Message →</button>
+    </section>
+    <section id="letter-section" class="section hidden-section">
+        <div class="letter-card">
+            <div class="star-glow">⭐</div>
+            <h2 id="letter-title">My Dearest Star,</h2>
+            <p id="letter-body">...</p>
+            <div class="letter-sig"><span id="sender-name">Your Universe</span></div>
+        </div>
+        <button class="btn-star" id="next-to-timeline">Our Orbit →</button>
+    </section>
+    <section id="timeline-section" class="section hidden-section">
+        <div class="section-header">
+            <h2>Our Cosmic Journey</h2>
+        </div>
+        <div class="timeline" id="timeline"></div>
+        <button class="btn-star" id="next-to-quiz">Star Quiz →</button>
+    </section>
+    <section id="quiz-section" class="section hidden-section">
+        <div class="section-header">
+            <h2 id="quiz-question">Question</h2>
+        </div>
+        <div class="quiz-grid" id="quiz-options"></div>
+        <button class="btn-star hidden" id="next-to-gift">Reveal Gift →</button>
+    </section>
+    <section id="gift-section" class="section hidden-section">
+        <div class="section-header">
+            <h2>A Celestial Gift</h2>
+        </div>
+        <div class="gift-box" id="gift-box"><span>🎁</span>
+            <p>Tap to reveal</p>
+        </div>
+        <div id="gift-content" class="hidden"><img id="gift-image" src="" alt="Gift">
+            <p id="gift-message"></p>
+        </div>
+        <button class="btn-star hidden" id="next-to-finale">Final Question →</button>
+    </section>
+    <section id="finale-section" class="section hidden-section">
+        <div class="finale-content">
+            <div class="finale-stars">⭐✨🌟</div>
+            <h1 id="question-text">Will you orbit with me forever?</h1>
+            <div class="finale-buttons">
+                <button id="yes-btn" class="btn-yes">Yes! 💫</button>
+                <button id="no-btn" class="btn-no">Not yet</button>
+            </div>
+            <div id="success-message" class="hidden">
+                <div class="success-stars">🌟✨⭐💫🌠</div>
+                <h1>To Infinity!</h1>
+                <p>Happy Valentine's Day, my star! ✨</p>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <audio id="bgMusic" loop>
+        <source src="" type="audio/mp3">
+    </audio>
+    <button id="musicToggle" class="music-btn">♪</button>
+    <section id="hero" class="section">
+        <div class="hero-content">
+            <span class="hero-emoji">♥</span>
+            <h1 class="hero-title">For You</h1>
+            <p class="hero-subtitle">Something special awaits</p>
+            <button class="btn-minimal" id="start-btn">Begin →</button>
+        </div>
+    </section>
+    <section id="gallery-section" class="section hidden-section">
+        <h2 class="section-title">Our Moments</h2>
+        <div class="gallery-grid" id="gallery"></div>
+        <button class="btn-minimal" id="next-to-letter">Next →</button>
+    </section>
+    <section id="letter-section" class="section hidden-section">
+        <div class="letter-card">
+            <h2 id="letter-title">Dear You,</h2>
+            <p id="letter-body">...</p>
+            <div class="letter-from">— <span id="sender-name">Me</span></div>
+        </div>
+        <button class="btn-minimal" id="next-to-timeline">Continue →</button>
+    </section>
+    <section id="timeline-section" class="section hidden-section">
+        <h2 class="section-title">Our Story</h2>
+        <div class="timeline" id="timeline"></div>
+        <button class="btn-minimal" id="next-to-quiz">Quiz →</button>
+    </section>
+    <section id="quiz-section" class="section hidden-section">
+        <h2 id="quiz-question" class="section-title">Question</h2>
+        <div class="quiz-grid" id="quiz-options"></div>
+        <button class="btn-minimal hidden" id="next-to-gift">Gift →</button>
+    </section>
+    <section id="gift-section" class="section hidden-section">
+        <h2 class="section-title">A Gift</h2>
+        <div class="gift-box" id="gift-box"><span>🎁</span></div>
+        <div id="gift-content" class="hidden"><img id="gift-image" src="" alt="Gift">
+            <p id="gift-message"></p>
+        </div>
+        <button class="btn-minimal hidden" id="next-to-finale">Continue →</button>
+    </section>
+    <section id="finale-section" class="section hidden-section">
+        <div class="finale-content">
+            <h1 id="question-text">Be my Valentine?</h1>
+            <div class="finale-buttons">
+                <button id="yes-btn" class="btn-yes">Yes ♥</button>
+                <button id="no-btn" class="btn-no">No</button>
+            </div>
+            <div id="success-message" class="hidden">
+                <span class="success-heart">♥</span>
+                <h1>Happy Valentine's Day!</h1>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

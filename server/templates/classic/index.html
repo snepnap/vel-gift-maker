@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Romance 🕯️</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <audio id="bgMusic" loop>
+        <source src="" type="audio/mp3">
+    </audio>
+    <button id="musicToggle" class="music-btn">🎵</button>
+    <div class="paper-texture"></div>
+    <section id="hero" class="section">
+        <div class="hero-content">
+            <div class="ornament">❦</div>
+            <h1 class="hero-title">A Love Letter</h1>
+            <p class="hero-subtitle">For the one who holds my heart</p>
+            <button class="btn-classic" id="start-btn">Open the Envelope</button>
+        </div>
+    </section>
+    <section id="gallery-section" class="section hidden-section">
+        <div class="section-header">
+            <h2>Cherished Memories</h2>
+        </div>
+        <div class="gallery-grid" id="gallery"></div>
+        <button class="btn-classic" id="next-to-letter">Read My Letter</button>
+    </section>
+    <section id="letter-section" class="section hidden-section">
+        <div class="letter-parchment">
+            <h2 id="letter-title">My Dearest,</h2>
+            <p id="letter-body">...</p>
+            <div class="letter-sig"><span>Yours eternally,</span><strong id="sender-name">Your Love</strong></div>
+        </div>
+        <button class="btn-classic" id="next-to-timeline">Our Story</button>
+    </section>
+    <section id="timeline-section" class="section hidden-section">
+        <div class="section-header">
+            <h2>Our Journey Together</h2>
+        </div>
+        <div class="timeline" id="timeline"></div>
+        <button class="btn-classic" id="next-to-quiz">A Little Quiz</button>
+    </section>
+    <section id="quiz-section" class="section hidden-section">
+        <div class="section-header">
+            <h2 id="quiz-question">Question</h2>
+        </div>
+        <div class="quiz-grid" id="quiz-options"></div>
+        <button class="btn-classic hidden" id="next-to-gift">Your Gift</button>
+    </section>
+    <section id="gift-section" class="section hidden-section">
+        <div class="section-header">
+            <h2>A Token of My Love</h2>
+        </div>
+        <div class="gift-box" id="gift-box"><span>🎁</span>
+            <p>Unwrap your gift</p>
+        </div>
+        <div id="gift-content" class="hidden"><img id="gift-image" src="" alt="Gift">
+            <p id="gift-message"></p>
+        </div>
+        <button class="btn-classic hidden" id="next-to-finale">Final Question</button>
+    </section>
+    <section id="finale-section" class="section hidden-section">
+        <div class="finale-content">
+            <div class="ornament">❦</div>
+            <h1 id="question-text">Will you be my Valentine?</h1>
+            <div class="finale-buttons">
+                <button id="yes-btn" class="btn-yes">Yes, I will</button>
+                <button id="no-btn" class="btn-no">Perhaps...</button>
+            </div>
+            <div id="success-message" class="hidden">
+                <h1>My Heart is Yours</h1>
+                <p>Happy Valentine's Day, my love!</p>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
