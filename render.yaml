@@ -1,12 +1,12 @@
 services:
   - type: web
-    name: valentine-platform
+    name: valentine-gift-maker
     env: node
     plan: free
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node server/server.js
     envVars:
       - key: NODE_ENV
         value: production
-      - key: STRIPE_SECRET_KEY
-        sync: false  # You'll add this in Render dashboard
+      - key: UPI_ID
+        sync: false
