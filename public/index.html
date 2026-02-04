@@ -1371,6 +1371,76 @@
             // V17 UI State
             const [darkMode, setDarkMode] = useState(true);
 
+            // User Auth State
+            const [currentUser, setCurrentUser] = useState(null);
+            const [authModal, setAuthModal] = useState(null); // 'login' | 'register' | null
+            const [authLoading, setAuthLoading] = useState(false);
+            const [authError, setAuthError] = useState('');
+
+            // Check if user is logged in on load
+            useEffect(() => {
+                fetch('/api/auth/me', { credentials: 'include' })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) setCurrentUser(data.user);
+                    })
+                    .catch(() => { });
+            }, []);
+
+            // Login function
+            const handleLogin = async (email, password) => {
+                setAuthLoading(true);
+                setAuthError('');
+                try {
+                    const res = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        setCurrentUser(data.user);
+                        setAuthModal(null);
+                    } else {
+                        setAuthError(data.error || 'Login failed');
+                    }
+                } catch (e) {
+                    setAuthError('Login failed');
+                }
+                setAuthLoading(false);
+            };
+
+            // Register function
+            const handleRegister = async (name, email, password) => {
+                setAuthLoading(true);
+                setAuthError('');
+                try {
+                    const res = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ name, email, password })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        setCurrentUser(data.user);
+                        setAuthModal(null);
+                    } else {
+                        setAuthError(data.error || 'Registration failed');
+                    }
+                } catch (e) {
+                    setAuthError('Registration failed');
+                }
+                setAuthLoading(false);
+            };
+
+            // Logout function
+            const handleLogout = async () => {
+                await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+                setCurrentUser(null);
+            };
+
             // Calculate progress
             const calculateProgress = () => {
                 let filled = 0;
@@ -1621,6 +1691,32 @@
                     {/* SIDEBAR */}
                     <div className="sidebar">
                         <div className="sidebar-logo">💘</div>
+
+                        {/* User Account Button */}
+                        {currentUser ? (
+                            <div
+                                className="sidebar-item"
+                                data-tooltip={currentUser.name}
+                                onClick={() => {
+                                    if (confirm(`Logged in as ${currentUser.email}\n\nLogout?`)) {
+                                        handleLogout();
+                                    }
+                                }}
+                                style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-purple))', color: 'white' }}
+                            >
+                                {currentUser.name.charAt(0).toUpperCase()}
+                            </div>
+                        ) : (
+                            <div
+                                className="sidebar-item"
+                                data-tooltip="Login / Sign Up"
+                                onClick={() => setAuthModal('login')}
+                            >
+                                👤
+                            </div>
+                        )}
+
+                        <div className="sidebar-divider"></div>
                         <div className={`sidebar-item ${activeSection === 'themes' ? 'active' : ''}`} data-tooltip="Themes" onClick={() => setActiveSection('themes')}>🎨</div>
                         <div className={`sidebar-item ${activeSection === 'content' ? 'active' : ''}`} data-tooltip="Content" onClick={() => setActiveSection('content')}>✍️</div>
                         <div className={`sidebar-item ${activeSection === 'features' ? 'active' : ''}`} data-tooltip="Features" onClick={() => setActiveSection('features')}>✨</div>
@@ -2010,6 +2106,62 @@
                             <button className="btn-no" style={{ width: '100%', padding: 12, border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }} onClick={() => setAiModalOpen(false)}>Cancel</button>
                         </div>
                     </div>
+
+                    {/* AUTH MODAL */}
+                    {authModal && (
+                        <div className="modal-backdrop open" onClick={(e) => e.target.className.includes('modal-backdrop') && setAuthModal(null)}>
+                            <div className="modal-card" style={{ maxWidth: 380 }}>
+                                <div style={{ fontSize: 48, marginBottom: 16 }}>{authModal === 'login' ? '🔐' : '👤'}</div>
+                                <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
+                                    {authModal === 'login' ? 'Welcome Back!' : 'Create Account'}
+                                </h2>
+                                <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 20 }}>
+                                    {authModal === 'login' ? 'Login to save your valentines' : 'Sign up to save & manage valentines'}
+                                </p>
+
+                                {authError && (
+                                    <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', padding: 10, borderRadius: 8, marginBottom: 16, color: '#ef4444', fontSize: 13 }}>
+                                        {authError}
+                                    </div>
+                                )}
+
+                                <form onSubmit={(e) => {
+                                    e.preventDefault();
+                                    const form = e.target;
+                                    if (authModal === 'login') {
+                                        handleLogin(form.email.value, form.password.value);
+                                    } else {
+                                        handleRegister(form.name.value, form.email.value, form.password.value);
+                                    }
+                                }}>
+                                    {authModal === 'register' && (
+                                        <input name="name" className="form-input" placeholder="Your Name" required style={{ marginBottom: 10 }} />
+                                    )}
+                                    <input name="email" type="email" className="form-input" placeholder="Email" required style={{ marginBottom: 10 }} />
+                                    <input name="password" type="password" className="form-input" placeholder="Password (min 6 chars)" required minLength="6" style={{ marginBottom: 16 }} />
+
+                                    <button type="submit" className="btn-primary" disabled={authLoading} style={{ width: '100%', marginBottom: 12 }}>
+                                        {authLoading ? '...' : (authModal === 'login' ? 'Login' : 'Create Account')}
+                                    </button>
+                                </form>
+
+                                <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                                    {authModal === 'login' ? (
+                                        <>Don't have an account? <span style={{ color: 'var(--accent)', cursor: 'pointer' }} onClick={() => { setAuthModal('register'); setAuthError(''); }}>Sign Up</span></>
+                                    ) : (
+                                        <>Already have an account? <span style={{ color: 'var(--accent)', cursor: 'pointer' }} onClick={() => { setAuthModal('login'); setAuthError(''); }}>Login</span></>
+                                    )}
+                                </div>
+
+                                <button
+                                    style={{ width: '100%', padding: 12, border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', marginTop: 12 }}
+                                    onClick={() => setAuthModal(null)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {/* UPI PAYMENT MODAL */}
                     {upiModal && (

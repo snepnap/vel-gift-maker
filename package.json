@@ -1,7 +1,7 @@
 {
   "name": "valentine-platform",
-  "version": "1.0.0",
-  "description": "Premium Valentine's Day webpage builder",
+  "version": "2.0.0",
+  "description": "Premium Valentine's Day webpage builder with MongoDB & Auth",
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
@@ -14,14 +14,19 @@
     "valentine",
     "romantic",
     "webpage",
-    "builder"
+    "builder",
+    "saas"
   ],
   "author": "Anand",
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.2",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
-    "dotenv": "^16.6.1",
-    "express": "^5.2.1"
+    "dotenv": "^16.0.0",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^9.1.5"
   }
 }

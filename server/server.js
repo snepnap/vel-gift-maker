@@ -1,25 +1,49 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs');
 
 require('dotenv').config();
 
+// MongoDB
+const connectDB = require('./config/db');
+const User = require('./models/User');
+const Order = require('./models/Order');
+const Valentine = require('./models/Valentine');
+
+// Routes
+const authRoutes = require('./routes/auth');
+const { auth } = require('./middleware/auth');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Check required env vars
 const UPI_ID = process.env.UPI_ID;
+const JWT_SECRET = process.env.JWT_SECRET || 'valentine-secret-2024';
+
 if (!UPI_ID) {
-    console.error('❌ ERROR: UPI_ID not set!');
+    console.error('❌ UPI_ID not set!');
     process.exit(1);
 }
 
-app.use(cors());
+// Connect to MongoDB
+if (process.env.MONGODB_URI) {
+    connectDB();
+} else {
+    console.log('⚠️ MONGODB_URI not set, using file-based storage');
+}
+
+// Middleware
+app.use(cors({ origin: true, credentials: true }));
 app.use(bodyParser.json({ limit: '10mb' }));
+app.use(cookieParser());
+app.use(auth); // Add user to req if logged in
 
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} ${req.user ? `(${req.user.email})` : ''}`);
     next();
 });
 
@@ -28,193 +52,236 @@ app.use(express.static(path.join(__dirname, '../public')));
 const templatesPath = path.resolve(__dirname, 'templates');
 app.use('/templates', express.static(templatesPath));
 
-// LOWER PRICES (More affordable!)
+// Auth Routes
+app.use('/api/auth', authRoutes);
+
+// PRICING
 const PRICING = {
-    base_theme: 49,          // Was 199 → Now ₹49
-    feature_gallery: 19,     // Photo Gallery
-    feature_music: 19,       // Custom Music
-    feature_timeline: 29,    // Relationship Timeline
-    feature_quiz: 19,        // Love Quiz
-    feature_gift: 29,        // Virtual Gift
-    feature_countdown: 9,    // Countdown Timer
-    feature_password: 9,     // Password Protection
-    feature_scratch: 39,     // Scratch Card
-    feature_spin: 39,        // Spin Wheel
-    feature_memory: 39,      // Memory Game
-    feature_video: 49,       // Video Message
-    feature_confetti: 9      // Confetti Burst
+    base_theme: 49,
+    feature_gallery: 19,
+    feature_music: 19,
+    feature_timeline: 29,
+    feature_quiz: 19,
+    feature_gift: 29,
+    feature_countdown: 9,
+    feature_password: 9,
+    feature_scratch: 39,
+    feature_spin: 39,
+    feature_memory: 39,
+    feature_video: 49,
+    feature_confetti: 9
 };
 
-// Helper: Generate short unique ID
+// Helper: Generate ID
 function generateId() {
     return Math.random().toString(36).substr(2, 8).toUpperCase();
 }
 
-// Helper: Get DB path
-function getDbPath(name) {
-    return path.join(__dirname, `${name}.json`);
-}
-
-// Helper: Read JSON file
-function readDb(name) {
-    const dbPath = getDbPath(name);
-    if (fs.existsSync(dbPath)) {
-        try { return JSON.parse(fs.readFileSync(dbPath, 'utf8')); }
-        catch (e) { return []; }
-    }
-    return [];
-}
-
-// Helper: Write JSON file
-function writeDb(name, data) {
-    fs.writeFileSync(getDbPath(name), JSON.stringify(data, null, 2));
-}
-
 // API: Health
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', env: process.env.NODE_ENV || 'development' });
-});
-
-// API: Create Order & Get UPI QR
-app.post('/api/create-order', (req, res) => {
-    const { features, theme, config, customerName } = req.body;
-
-    let total = PRICING.base_theme;
-    if (features && Array.isArray(features)) {
-        features.forEach(f => {
-            if (PRICING[f]) total += PRICING[f];
-        });
-    }
-
-    const orderId = 'VAL-' + generateId();
-    const upiLink = `upi://pay?pa=${UPI_ID}&pn=ValentineGift&am=${total}&tn=Order_${orderId}&cu=INR`;
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
-
-    const orders = readDb('orders');
-    orders.push({
-        orderId,
-        amount: total,
-        customerName: customerName || 'Guest',
-        theme,
-        features,
-        config,
-        status: 'pending',
-        createdAt: new Date()
-    });
-    writeDb('orders', orders);
-
-    console.log(`[ORDER] ${orderId} - ₹${total}`);
-
-    res.json({ orderId, amount: total, upiId: UPI_ID, upiLink, qrUrl });
-});
-
-// API: Confirm Payment & Generate Share Link
-app.post('/api/confirm-payment', (req, res) => {
-    const { orderId, transactionId } = req.body;
-
-    if (!transactionId || transactionId.length < 6) {
-        return res.status(400).json({ error: 'Invalid transaction ID' });
-    }
-
-    const orders = readDb('orders');
-    const orderIndex = orders.findIndex(o => o.orderId === orderId);
-
-    if (orderIndex < 0) {
-        return res.status(404).json({ error: 'Order not found' });
-    }
-
-    const order = orders[orderIndex];
-
-    // Generate unique valentine ID
-    const valentineId = generateId();
-
-    // Save valentine page
-    const valentines = readDb('valentines');
-    valentines.push({
-        id: valentineId,
-        orderId: orderId,
-        theme: order.theme,
-        config: order.config,
-        features: order.features,
-        createdAt: new Date(),
-        views: 0
-    });
-    writeDb('valentines', valentines);
-
-    // Update order
-    orders[orderIndex].status = 'paid';
-    orders[orderIndex].transactionId = transactionId;
-    orders[orderIndex].valentineId = valentineId;
-    orders[orderIndex].paidAt = new Date();
-    writeDb('orders', orders);
-
-    console.log(`[PAID] ${orderId} → Valentine: ${valentineId}`);
-
     res.json({
-        success: true,
-        orderId,
-        valentineId,
-        shareUrl: `/v/${valentineId}`,
-        message: 'Payment confirmed! Share this link with your loved one! 💕'
+        status: 'ok',
+        db: process.env.MONGODB_URI ? 'mongodb' : 'file',
+        user: req.user ? req.user.email : null
     });
+});
+
+// API: Create Order
+app.post('/api/create-order', async (req, res) => {
+    try {
+        const { features, theme, config, customerName } = req.body;
+
+        let total = PRICING.base_theme;
+        if (features && Array.isArray(features)) {
+            features.forEach(f => {
+                if (PRICING[f]) total += PRICING[f];
+            });
+        }
+
+        const orderId = 'VAL-' + generateId();
+        const upiLink = `upi://pay?pa=${UPI_ID}&pn=ValentineGift&am=${total}&tn=Order_${orderId}&cu=INR`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+
+        // Save order
+        if (process.env.MONGODB_URI) {
+            await Order.create({
+                orderId,
+                user: req.user?._id,
+                amount: total,
+                theme,
+                features,
+                status: 'pending'
+            });
+        }
+
+        console.log(`[ORDER] ${orderId} - ₹${total} ${req.user ? `by ${req.user.email}` : ''}`);
+
+        res.json({ orderId, amount: total, upiId: UPI_ID, upiLink, qrUrl });
+    } catch (error) {
+        console.error('Create order error:', error);
+        res.status(500).json({ error: 'Order creation failed' });
+    }
+});
+
+// API: Confirm Payment
+app.post('/api/confirm-payment', async (req, res) => {
+    try {
+        const { orderId, transactionId, config } = req.body;
+
+        if (!transactionId || transactionId.length < 6) {
+            return res.status(400).json({ error: 'Invalid transaction ID' });
+        }
+
+        const valentineId = generateId();
+
+        if (process.env.MONGODB_URI) {
+            // Find and update order
+            const order = await Order.findOne({ orderId });
+            if (!order) {
+                return res.status(404).json({ error: 'Order not found' });
+            }
+
+            order.status = 'paid';
+            order.transactionId = transactionId;
+            order.valentineId = valentineId;
+            order.paidAt = new Date();
+            await order.save();
+
+            // Create valentine
+            await Valentine.create({
+                valentineId,
+                user: req.user?._id,
+                orderId,
+                theme: order.theme,
+                config: config || {},
+                features: order.features
+            });
+        }
+
+        console.log(`[PAID] ${orderId} → Valentine: ${valentineId}`);
+
+        res.json({
+            success: true,
+            orderId,
+            valentineId,
+            shareUrl: `/v/${valentineId}`,
+            message: 'Payment confirmed! Share this link with your loved one! 💕'
+        });
+    } catch (error) {
+        console.error('Confirm payment error:', error);
+        res.status(500).json({ error: 'Payment confirmation failed' });
+    }
 });
 
 // SERVE VALENTINE PAGE
-app.get('/v/:id', (req, res) => {
-    const valentines = readDb('valentines');
-    const valentine = valentines.find(v => v.id === req.params.id);
+app.get('/v/:id', async (req, res) => {
+    try {
+        let valentine;
 
-    if (!valentine) {
-        return res.status(404).send('<h1>Valentine not found 💔</h1><p>This link may have expired or is invalid.</p>');
-    }
+        if (process.env.MONGODB_URI) {
+            valentine = await Valentine.findOne({ valentineId: req.params.id });
+            if (valentine) {
+                valentine.views += 1;
+                await valentine.save();
+            }
+        }
 
-    // Increment view count
-    const index = valentines.findIndex(v => v.id === req.params.id);
-    valentines[index].views = (valentines[index].views || 0) + 1;
-    writeDb('valentines', valentines);
+        if (!valentine) {
+            return res.status(404).send(`
+                <html>
+                <head><title>Valentine Not Found</title></head>
+                <body style="font-family: system-ui; text-align: center; padding: 100px; background: linear-gradient(135deg, #0f0c29, #302b63); color: white;">
+                    <h1>💔 Valentine Not Found</h1>
+                    <p>This link may have expired or is invalid.</p>
+                    <a href="/" style="color: #f43f5e;">Create Your Own →</a>
+                </body>
+                </html>
+            `);
+        }
 
-    // Serve template with embedded config
-    const templatePath = path.join(templatesPath, valentine.theme, 'index.html');
-    if (fs.existsSync(templatePath)) {
-        let html = fs.readFileSync(templatePath, 'utf8');
+        const templatePath = path.join(templatesPath, valentine.theme, 'index.html');
+        if (fs.existsSync(templatePath)) {
+            let html = fs.readFileSync(templatePath, 'utf8');
 
-        // Inject the saved config
-        const configScript = `<script>
-            window.VALENTINE_CONFIG = ${JSON.stringify(valentine.config)};
-            window.VALENTINE_FEATURES = ${JSON.stringify(valentine.features)};
-        </script>`;
+            const configScript = `<script>
+                window.VALENTINE_CONFIG = ${JSON.stringify(valentine.config)};
+                window.VALENTINE_FEATURES = ${JSON.stringify(valentine.features)};
+            </script>`;
 
-        html = html.replace('</head>', configScript + '</head>');
-        res.send(html);
-    } else {
-        res.redirect(`/templates/${valentine.theme}/index.html`);
+            html = html.replace('</head>', configScript + '</head>');
+            res.send(html);
+        } else {
+            res.redirect(`/templates/${valentine.theme}/index.html`);
+        }
+    } catch (error) {
+        console.error('Valentine page error:', error);
+        res.status(500).send('Error loading valentine');
     }
 });
 
-// API: Admin - Get all orders
-app.get('/api/orders', (req, res) => {
-    res.json(readDb('orders'));
+// API: Get user's valentines
+app.get('/api/my-valentines', async (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({ error: 'Login required' });
+    }
+
+    try {
+        const valentines = await Valentine.find({ user: req.user._id }).sort({ createdAt: -1 });
+        res.json(valentines);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch valentines' });
+    }
 });
 
-// API: Admin - Get stats
-app.get('/api/stats', (req, res) => {
-    const orders = readDb('orders');
-    const valentines = readDb('valentines');
-    const paidOrders = orders.filter(o => o.status === 'paid');
-    const totalRevenue = paidOrders.reduce((sum, o) => sum + o.amount, 0);
+// API: Get user's orders
+app.get('/api/my-orders', async (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({ error: 'Login required' });
+    }
 
-    res.json({
-        totalOrders: orders.length,
-        paidOrders: paidOrders.length,
-        pendingOrders: orders.length - paidOrders.length,
-        totalValentines: valentines.length,
-        totalRevenue: totalRevenue,
-        totalViews: valentines.reduce((sum, v) => sum + (v.views || 0), 0)
-    });
+    try {
+        const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch orders' });
+    }
+});
+
+// API: Admin stats
+app.get('/api/stats', async (req, res) => {
+    try {
+        if (process.env.MONGODB_URI) {
+            const totalOrders = await Order.countDocuments();
+            const paidOrders = await Order.countDocuments({ status: 'paid' });
+            const totalValentines = await Valentine.countDocuments();
+            const totalUsers = await User.countDocuments();
+
+            const paidOrdersData = await Order.find({ status: 'paid' });
+            const totalRevenue = paidOrdersData.reduce((sum, o) => sum + o.amount, 0);
+
+            const valentines = await Valentine.find();
+            const totalViews = valentines.reduce((sum, v) => sum + (v.views || 0), 0);
+
+            res.json({
+                totalOrders,
+                paidOrders,
+                pendingOrders: totalOrders - paidOrders,
+                totalValentines,
+                totalUsers,
+                totalRevenue,
+                totalViews
+            });
+        } else {
+            res.json({ message: 'Stats require MongoDB' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Stats failed' });
+    }
 });
 
 app.listen(PORT, () => {
     console.log(`🚀 Valentine Platform running on port ${PORT}`);
     console.log(`💰 UPI: ${UPI_ID.substring(0, 4)}****`);
-    console.log(`📊 Pricing: Base ₹${PRICING.base_theme}`);
+    console.log(`🔐 JWT: ${JWT_SECRET ? 'Configured' : 'Using default'}`);
+    console.log(`📊 DB: ${process.env.MONGODB_URI ? 'MongoDB' : 'File-based'}`);
 });
