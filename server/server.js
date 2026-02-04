@@ -23,6 +23,7 @@ const PORT = process.env.PORT || 3000;
 // Check required env vars
 const UPI_ID = process.env.UPI_ID;
 const JWT_SECRET = process.env.JWT_SECRET || 'valentine-secret-2024';
+const ADMIN_KEY = process.env.ADMIN_KEY || 'admin-secret-2024';
 
 if (!UPI_ID) {
     console.error('❌ UPI_ID not set!');
@@ -40,7 +41,7 @@ if (process.env.MONGODB_URI) {
 app.use(cors({ origin: true, credentials: true }));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(cookieParser());
-app.use(auth); // Add user to req if logged in
+app.use(auth);
 
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} ${req.user ? `(${req.user.email})` : ''}`);
@@ -86,10 +87,10 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// API: Create Order
+// API: Create Order (Just creates order, no valentine yet)
 app.post('/api/create-order', async (req, res) => {
     try {
-        const { features, theme, config, customerName } = req.body;
+        const { features, theme, config } = req.body;
 
         let total = PRICING.base_theme;
         if (features && Array.isArray(features)) {
@@ -102,7 +103,7 @@ app.post('/api/create-order', async (req, res) => {
         const upiLink = `upi://pay?pa=${UPI_ID}&pn=ValentineGift&am=${total}&tn=Order_${orderId}&cu=INR`;
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
 
-        // Save order
+        // Save order (pending, no valentine created yet)
         if (process.env.MONGODB_URI) {
             await Order.create({
                 orderId,
@@ -110,6 +111,7 @@ app.post('/api/create-order', async (req, res) => {
                 amount: total,
                 theme,
                 features,
+                config, // Save config with order for later
                 status: 'pending'
             });
         }
@@ -123,7 +125,7 @@ app.post('/api/create-order', async (req, res) => {
     }
 });
 
-// API: Confirm Payment
+// API: Submit Payment (User claims they paid - goes to PENDING VERIFICATION)
 app.post('/api/confirm-payment', async (req, res) => {
     try {
         const { orderId, transactionId, config } = req.body;
@@ -132,48 +134,137 @@ app.post('/api/confirm-payment', async (req, res) => {
             return res.status(400).json({ error: 'Invalid transaction ID' });
         }
 
-        const valentineId = generateId();
-
         if (process.env.MONGODB_URI) {
-            // Find and update order
             const order = await Order.findOne({ orderId });
             if (!order) {
                 return res.status(404).json({ error: 'Order not found' });
             }
 
-            order.status = 'paid';
+            // Mark as "awaiting verification" NOT "paid"
+            order.status = 'awaiting_verification';
             order.transactionId = transactionId;
-            order.valentineId = valentineId;
-            order.paidAt = new Date();
+            order.config = config || order.config;
+            order.submittedAt = new Date();
             await order.save();
+        }
+
+        console.log(`[PENDING] ${orderId} - Transaction: ${transactionId} (awaiting verification)`);
+
+        // Show user that payment is being verified
+        res.json({
+            success: true,
+            status: 'pending_verification',
+            orderId,
+            message: '✅ Payment submitted! Your Valentine link will be sent to your email within 1 hour after verification. You can also check status on our WhatsApp: +91 8709157822'
+        });
+    } catch (error) {
+        console.error('Confirm payment error:', error);
+        res.status(500).json({ error: 'Payment submission failed' });
+    }
+});
+
+// API: ADMIN - Verify payment and create valentine
+app.post('/api/admin/verify-payment', async (req, res) => {
+    try {
+        const { orderId, adminKey } = req.body;
+
+        // Simple admin key check
+        if (adminKey !== ADMIN_KEY) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        if (process.env.MONGODB_URI) {
+            const order = await Order.findOne({ orderId });
+            if (!order) {
+                return res.status(404).json({ error: 'Order not found' });
+            }
+
+            if (order.status === 'paid') {
+                return res.json({ success: true, message: 'Already verified', valentineId: order.valentineId });
+            }
+
+            // Generate valentine link
+            const valentineId = generateId();
 
             // Create valentine
             await Valentine.create({
                 valentineId,
-                user: req.user?._id,
+                user: order.user,
                 orderId,
                 theme: order.theme,
-                config: config || {},
+                config: order.config || {},
                 features: order.features
             });
+
+            // Update order
+            order.status = 'paid';
+            order.valentineId = valentineId;
+            order.paidAt = new Date();
+            await order.save();
+
+            console.log(`[VERIFIED] ${orderId} → Valentine: ${valentineId}`);
+
+            res.json({
+                success: true,
+                orderId,
+                valentineId,
+                shareUrl: `/v/${valentineId}`,
+                message: 'Payment verified! Valentine link created.'
+            });
+        } else {
+            res.status(500).json({ error: 'MongoDB required' });
         }
-
-        console.log(`[PAID] ${orderId} → Valentine: ${valentineId}`);
-
-        res.json({
-            success: true,
-            orderId,
-            valentineId,
-            shareUrl: `/v/${valentineId}`,
-            message: 'Payment confirmed! Share this link with your loved one! 💕'
-        });
     } catch (error) {
-        console.error('Confirm payment error:', error);
-        res.status(500).json({ error: 'Payment confirmation failed' });
+        console.error('Verify payment error:', error);
+        res.status(500).json({ error: 'Verification failed' });
     }
 });
 
-// SERVE VALENTINE PAGE
+// API: ADMIN - Get pending payments
+app.get('/api/admin/pending', async (req, res) => {
+    const adminKey = req.query.key || req.headers['x-admin-key'];
+
+    if (adminKey !== ADMIN_KEY) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+        if (process.env.MONGODB_URI) {
+            const pendingOrders = await Order.find({ status: 'awaiting_verification' }).sort({ submittedAt: -1 });
+            res.json(pendingOrders);
+        } else {
+            res.json([]);
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch pending orders' });
+    }
+});
+
+// API: Check order status (for user to check)
+app.get('/api/order-status/:orderId', async (req, res) => {
+    try {
+        if (process.env.MONGODB_URI) {
+            const order = await Order.findOne({ orderId: req.params.orderId });
+            if (!order) {
+                return res.status(404).json({ error: 'Order not found' });
+            }
+
+            res.json({
+                orderId: order.orderId,
+                status: order.status,
+                amount: order.amount,
+                valentineId: order.valentineId || null,
+                shareUrl: order.valentineId ? `/v/${order.valentineId}` : null
+            });
+        } else {
+            res.status(404).json({ error: 'Order not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to check status' });
+    }
+});
+
+// SERVE VALENTINE PAGE (Only for verified/paid orders)
 app.get('/v/:id', async (req, res) => {
     try {
         let valentine;
@@ -192,7 +283,8 @@ app.get('/v/:id', async (req, res) => {
                 <head><title>Valentine Not Found</title></head>
                 <body style="font-family: system-ui; text-align: center; padding: 100px; background: linear-gradient(135deg, #0f0c29, #302b63); color: white;">
                     <h1>💔 Valentine Not Found</h1>
-                    <p>This link may have expired or is invalid.</p>
+                    <p>This link may not be verified yet or is invalid.</p>
+                    <p style="color: #a1a1aa; font-size: 14px;">If you just paid, please wait for verification (up to 1 hour).</p>
                     <a href="/" style="color: #f43f5e;">Create Your Own →</a>
                 </body>
                 </html>
@@ -253,6 +345,7 @@ app.get('/api/stats', async (req, res) => {
         if (process.env.MONGODB_URI) {
             const totalOrders = await Order.countDocuments();
             const paidOrders = await Order.countDocuments({ status: 'paid' });
+            const pendingOrders = await Order.countDocuments({ status: 'awaiting_verification' });
             const totalValentines = await Valentine.countDocuments();
             const totalUsers = await User.countDocuments();
 
@@ -265,7 +358,7 @@ app.get('/api/stats', async (req, res) => {
             res.json({
                 totalOrders,
                 paidOrders,
-                pendingOrders: totalOrders - paidOrders,
+                pendingOrders,
                 totalValentines,
                 totalUsers,
                 totalRevenue,

@@ -1591,21 +1591,33 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             orderId: upiModal.orderId,
-                            transactionId
+                            transactionId,
+                            config // Send config for when admin verifies
                         })
                     });
                     const data = await res.json();
                     if (data.success) {
-                        setOrderData({
-                            orderId: data.orderId,
-                            valentineId: data.valentineId,
-                            shareUrl: data.shareUrl,
-                            success: true
-                        });
+                        // Check if it's pending verification or already verified
+                        if (data.status === 'pending_verification') {
+                            setOrderData({
+                                orderId: data.orderId,
+                                pending: true,
+                                message: data.message
+                            });
+                        } else {
+                            setOrderData({
+                                orderId: data.orderId,
+                                valentineId: data.valentineId,
+                                shareUrl: data.shareUrl,
+                                success: true
+                            });
+                        }
                         setUpiModal(null);
+                    } else {
+                        alert(data.error || 'Confirmation failed');
                     }
                 } catch (e) {
-                    alert('Confirmation failed');
+                    alert('Confirmation failed. Please try again.');
                 }
             };
 
@@ -2045,50 +2057,87 @@
                         </div>
                     )}
 
-                    {/* SUCCESS MODAL WITH SHARE LINK */}
+                    {/* SUCCESS / PENDING MODAL */}
                     <div className={`modal-backdrop ${orderData ? 'open' : ''}`}>
                         <div className="modal-card" style={{ maxWidth: 420 }}>
-                            <div style={{ fontSize: 56, marginBottom: 20 }}>🎉</div>
-                            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Payment Confirmed!</h2>
-                            <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>Your Valentine's page is live! Share it with your loved one:</p>
+                            {/* PENDING VERIFICATION */}
+                            {orderData?.pending ? (
+                                <>
+                                    <div style={{ fontSize: 56, marginBottom: 20 }}>⏳</div>
+                                    <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Payment Submitted!</h2>
+                                    <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>
+                                        Your payment is being verified. You'll receive your Valentine link soon!
+                                    </p>
 
-                            {orderData?.shareUrl && (
-                                <div style={{ background: 'var(--bg-primary)', padding: 16, borderRadius: 14, marginBottom: 16, border: '2px solid var(--accent)' }}>
-                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>💕 YOUR VALENTINE LINK</div>
-                                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'var(--accent)', wordBreak: 'break-all', marginBottom: 12 }}>
-                                        {window.location.origin}{orderData.shareUrl}
+                                    <div style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid #22c55e', padding: 16, borderRadius: 14, marginBottom: 16 }}>
+                                        <div style={{ fontSize: 13, color: '#22c55e', fontWeight: 600, marginBottom: 8 }}>✅ What happens next?</div>
+                                        <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                                            1. We verify your payment (1-2 hours)<br />
+                                            2. Your Valentine link is generated<br />
+                                            3. Contact us on WhatsApp for instant delivery!
+                                        </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: 8 }}>
-                                        <button
-                                            className="btn-secondary"
-                                            style={{ flex: 1, padding: 10, fontSize: 13 }}
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(window.location.origin + orderData.shareUrl);
-                                                alert('Link copied! 💕');
-                                            }}
-                                        >
-                                            📋 Copy Link
-                                        </button>
-                                        <button
-                                            className="btn-primary"
-                                            style={{ flex: 1, padding: 10, fontSize: 13 }}
-                                            onClick={() => {
-                                                const url = window.location.origin + orderData.shareUrl;
-                                                const text = `I made something special for you! 💕\n${url}`;
-                                                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-                                            }}
-                                        >
-                                            📱 WhatsApp
-                                        </button>
+
+                                    <div style={{ background: 'var(--bg-tertiary)', padding: 12, borderRadius: 10, marginBottom: 16 }}>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>Order ID (save this!)</div>
+                                        <div style={{ fontFamily: 'monospace', fontSize: 16, color: 'var(--accent-purple)' }}>{orderData?.orderId}</div>
                                     </div>
-                                </div>
-                            )}
 
-                            <div style={{ background: 'var(--bg-tertiary)', padding: 12, borderRadius: 10, marginBottom: 20 }}>
-                                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Order ID: <span style={{ color: 'var(--accent-purple)' }}>{orderData?.orderId}</span></div>
-                            </div>
+                                    <button
+                                        className="btn-primary"
+                                        onClick={() => window.open(`https://wa.me/918709157822?text=Hi! I just paid for Order: ${orderData?.orderId}. Please verify my payment.`, '_blank')}
+                                        style={{ width: '100%', marginBottom: 10 }}
+                                    >
+                                        📱 WhatsApp for Instant Link
+                                    </button>
+                                    <button className="btn-secondary" onClick={() => setOrderData(null)} style={{ width: '100%' }}>Close</button>
+                                </>
+                            ) : orderData?.success ? (
+                                <>
+                                    {/* VERIFIED - SHOW SHARE LINK */}
+                                    <div style={{ fontSize: 56, marginBottom: 20 }}>🎉</div>
+                                    <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Payment Verified!</h2>
+                                    <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>Your Valentine's page is live! Share it with your loved one:</p>
 
-                            <button className="btn-secondary" onClick={() => setOrderData(null)} style={{ width: '100%' }}>Close</button>
+                                    {orderData?.shareUrl && (
+                                        <div style={{ background: 'var(--bg-primary)', padding: 16, borderRadius: 14, marginBottom: 16, border: '2px solid var(--accent)' }}>
+                                            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>💕 YOUR VALENTINE LINK</div>
+                                            <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'var(--accent)', wordBreak: 'break-all', marginBottom: 12 }}>
+                                                {window.location.origin}{orderData.shareUrl}
+                                            </div>
+                                            <div style={{ display: 'flex', gap: 8 }}>
+                                                <button
+                                                    className="btn-secondary"
+                                                    style={{ flex: 1, padding: 10, fontSize: 13 }}
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(window.location.origin + orderData.shareUrl);
+                                                        alert('Link copied! 💕');
+                                                    }}
+                                                >
+                                                    📋 Copy Link
+                                                </button>
+                                                <button
+                                                    className="btn-primary"
+                                                    style={{ flex: 1, padding: 10, fontSize: 13 }}
+                                                    onClick={() => {
+                                                        const url = window.location.origin + orderData.shareUrl;
+                                                        const text = `I made something special for you! 💕\n${url}`;
+                                                        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                                                    }}
+                                                >
+                                                    📱 WhatsApp
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div style={{ background: 'var(--bg-tertiary)', padding: 12, borderRadius: 10, marginBottom: 20 }}>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Order ID: <span style={{ color: 'var(--accent-purple)' }}>{orderData?.orderId}</span></div>
+                                    </div>
+
+                                    <button className="btn-secondary" onClick={() => setOrderData(null)} style={{ width: '100%' }}>Close</button>
+                                </>
+                            ) : null}
                         </div>
                     </div>
 
