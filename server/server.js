@@ -4,24 +4,20 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 
-// Load environment variables
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// UPI ID from environment variable (SECURE - not in code!)
 const UPI_ID = process.env.UPI_ID;
-
 if (!UPI_ID) {
-    console.error('❌ ERROR: UPI_ID not set! Add it to .env file or Render environment.');
+    console.error('❌ ERROR: UPI_ID not set!');
     process.exit(1);
 }
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' }));
 
-// Logging
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
@@ -29,37 +25,60 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Serve Templates
 const templatesPath = path.resolve(__dirname, 'templates');
 app.use('/templates', express.static(templatesPath));
 
-// PRICING
+// LOWER PRICES (More affordable!)
 const PRICING = {
-    base_theme: 199,
-    feature_gallery: 69,
-    feature_music: 49,
-    feature_timeline: 79,
-    feature_quiz: 59,
-    feature_gift: 89,
-    feature_countdown: 39,
-    feature_password: 29,
-    feature_scratch: 99,
-    feature_spin: 119,
-    feature_memory: 109,
-    feature_video: 149,
-    feature_confetti: 49
+    base_theme: 49,          // Was 199 → Now ₹49
+    feature_gallery: 19,     // Photo Gallery
+    feature_music: 19,       // Custom Music
+    feature_timeline: 29,    // Relationship Timeline
+    feature_quiz: 19,        // Love Quiz
+    feature_gift: 29,        // Virtual Gift
+    feature_countdown: 9,    // Countdown Timer
+    feature_password: 9,     // Password Protection
+    feature_scratch: 39,     // Scratch Card
+    feature_spin: 39,        // Spin Wheel
+    feature_memory: 39,      // Memory Game
+    feature_video: 49,       // Video Message
+    feature_confetti: 9      // Confetti Burst
 };
+
+// Helper: Generate short unique ID
+function generateId() {
+    return Math.random().toString(36).substr(2, 8).toUpperCase();
+}
+
+// Helper: Get DB path
+function getDbPath(name) {
+    return path.join(__dirname, `${name}.json`);
+}
+
+// Helper: Read JSON file
+function readDb(name) {
+    const dbPath = getDbPath(name);
+    if (fs.existsSync(dbPath)) {
+        try { return JSON.parse(fs.readFileSync(dbPath, 'utf8')); }
+        catch (e) { return []; }
+    }
+    return [];
+}
+
+// Helper: Write JSON file
+function writeDb(name, data) {
+    fs.writeFileSync(getDbPath(name), JSON.stringify(data, null, 2));
+}
 
 // API: Health
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', env: process.env.NODE_ENV || 'development' });
 });
 
-// API: Get UPI Payment QR
+// API: Create Order & Get UPI QR
 app.post('/api/create-order', (req, res) => {
-    const { features, theme, config, customerName, customerEmail } = req.body;
+    const { features, theme, config, customerName } = req.body;
 
-    // Calculate total
     let total = PRICING.base_theme;
     if (features && Array.isArray(features)) {
         features.forEach(f => {
@@ -67,78 +86,135 @@ app.post('/api/create-order', (req, res) => {
         });
     }
 
-    // Generate order ID
-    const orderId = 'VAL-' + Date.now().toString(36).toUpperCase();
-
-    // Create UPI payment link
+    const orderId = 'VAL-' + generateId();
     const upiLink = `upi://pay?pa=${UPI_ID}&pn=ValentineGift&am=${total}&tn=Order_${orderId}&cu=INR`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
 
-    // Save order as pending
-    const dbPath = path.join(__dirname, 'orders.json');
-    let orders = [];
-    if (fs.existsSync(dbPath)) {
-        try { orders = JSON.parse(fs.readFileSync(dbPath, 'utf8')); } catch (e) { }
-    }
-
+    const orders = readDb('orders');
     orders.push({
         orderId,
         amount: total,
-        customerName,
-        customerEmail,
+        customerName: customerName || 'Guest',
         theme,
         features,
+        config,
         status: 'pending',
         createdAt: new Date()
     });
+    writeDb('orders', orders);
 
-    fs.writeFileSync(dbPath, JSON.stringify(orders, null, 2));
-    console.log(`[ORDER] Created ${orderId} - ₹${total}`);
+    console.log(`[ORDER] ${orderId} - ₹${total}`);
 
-    res.json({
-        orderId,
-        amount: total,
-        upiId: UPI_ID,
-        upiLink,
-        qrUrl
-    });
+    res.json({ orderId, amount: total, upiId: UPI_ID, upiLink, qrUrl });
 });
 
-// API: Confirm Payment
+// API: Confirm Payment & Generate Share Link
 app.post('/api/confirm-payment', (req, res) => {
     const { orderId, transactionId } = req.body;
 
-    const dbPath = path.join(__dirname, 'orders.json');
-    let orders = [];
-    if (fs.existsSync(dbPath)) {
-        orders = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+    if (!transactionId || transactionId.length < 6) {
+        return res.status(400).json({ error: 'Invalid transaction ID' });
     }
 
+    const orders = readDb('orders');
     const orderIndex = orders.findIndex(o => o.orderId === orderId);
-    if (orderIndex >= 0) {
-        orders[orderIndex].status = 'paid';
-        orders[orderIndex].transactionId = transactionId;
-        orders[orderIndex].paidAt = new Date();
-        fs.writeFileSync(dbPath, JSON.stringify(orders, null, 2));
 
-        console.log(`[PAID] Order ${orderId} confirmed with txn ${transactionId}`);
-        res.json({ success: true, orderId });
+    if (orderIndex < 0) {
+        return res.status(404).json({ error: 'Order not found' });
+    }
+
+    const order = orders[orderIndex];
+
+    // Generate unique valentine ID
+    const valentineId = generateId();
+
+    // Save valentine page
+    const valentines = readDb('valentines');
+    valentines.push({
+        id: valentineId,
+        orderId: orderId,
+        theme: order.theme,
+        config: order.config,
+        features: order.features,
+        createdAt: new Date(),
+        views: 0
+    });
+    writeDb('valentines', valentines);
+
+    // Update order
+    orders[orderIndex].status = 'paid';
+    orders[orderIndex].transactionId = transactionId;
+    orders[orderIndex].valentineId = valentineId;
+    orders[orderIndex].paidAt = new Date();
+    writeDb('orders', orders);
+
+    console.log(`[PAID] ${orderId} → Valentine: ${valentineId}`);
+
+    res.json({
+        success: true,
+        orderId,
+        valentineId,
+        shareUrl: `/v/${valentineId}`,
+        message: 'Payment confirmed! Share this link with your loved one! 💕'
+    });
+});
+
+// SERVE VALENTINE PAGE
+app.get('/v/:id', (req, res) => {
+    const valentines = readDb('valentines');
+    const valentine = valentines.find(v => v.id === req.params.id);
+
+    if (!valentine) {
+        return res.status(404).send('<h1>Valentine not found 💔</h1><p>This link may have expired or is invalid.</p>');
+    }
+
+    // Increment view count
+    const index = valentines.findIndex(v => v.id === req.params.id);
+    valentines[index].views = (valentines[index].views || 0) + 1;
+    writeDb('valentines', valentines);
+
+    // Serve template with embedded config
+    const templatePath = path.join(templatesPath, valentine.theme, 'index.html');
+    if (fs.existsSync(templatePath)) {
+        let html = fs.readFileSync(templatePath, 'utf8');
+
+        // Inject the saved config
+        const configScript = `<script>
+            window.VALENTINE_CONFIG = ${JSON.stringify(valentine.config)};
+            window.VALENTINE_FEATURES = ${JSON.stringify(valentine.features)};
+        </script>`;
+
+        html = html.replace('</head>', configScript + '</head>');
+        res.send(html);
     } else {
-        res.status(404).json({ error: 'Order not found' });
+        res.redirect(`/templates/${valentine.theme}/index.html`);
     }
 });
 
-// API: Get orders (admin)
+// API: Admin - Get all orders
 app.get('/api/orders', (req, res) => {
-    const dbPath = path.join(__dirname, 'orders.json');
-    if (fs.existsSync(dbPath)) {
-        res.json(JSON.parse(fs.readFileSync(dbPath, 'utf8')));
-    } else {
-        res.json([]);
-    }
+    res.json(readDb('orders'));
+});
+
+// API: Admin - Get stats
+app.get('/api/stats', (req, res) => {
+    const orders = readDb('orders');
+    const valentines = readDb('valentines');
+    const paidOrders = orders.filter(o => o.status === 'paid');
+    const totalRevenue = paidOrders.reduce((sum, o) => sum + o.amount, 0);
+
+    res.json({
+        totalOrders: orders.length,
+        paidOrders: paidOrders.length,
+        pendingOrders: orders.length - paidOrders.length,
+        totalValentines: valentines.length,
+        totalRevenue: totalRevenue,
+        totalViews: valentines.reduce((sum, v) => sum + (v.views || 0), 0)
+    });
 });
 
 app.listen(PORT, () => {
     console.log(`🚀 Valentine Platform running on port ${PORT}`);
-    console.log(`💰 UPI ID: ${UPI_ID.substring(0, 4)}****${UPI_ID.slice(-4)}`); // Partially hidden in logs
+    console.log(`💰 UPI: ${UPI_ID.substring(0, 4)}****`);
+    console.log(`📊 Pricing: Base ₹${PRICING.base_theme}`);
 });

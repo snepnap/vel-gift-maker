@@ -1230,18 +1230,18 @@
         const { useState, useEffect, useRef } = React;
 
         const FEATURES = [
-            { id: 'feature_gallery', icon: '📸', label: 'Gallery', price: 69, desc: 'Photo memories' },
-            { id: 'feature_music', icon: '🎵', label: 'Music', price: 49, desc: 'Background audio' },
-            { id: 'feature_timeline', icon: '📅', label: 'Timeline', price: 79, desc: 'Your story' },
-            { id: 'feature_quiz', icon: '❓', label: 'Quiz', price: 59, desc: 'Fun questions' },
-            { id: 'feature_gift', icon: '🎁', label: 'Gift', price: 89, desc: 'Surprise reveal' },
-            { id: 'feature_countdown', icon: '⏳', label: 'Timer', price: 39, desc: 'Countdown' },
-            { id: 'feature_password', icon: '🔐', label: 'Lock', price: 29, desc: 'PIN protect' },
-            { id: 'feature_scratch', icon: '🎟️', label: 'Scratch', price: 99, desc: 'Scratch reveal' },
-            { id: 'feature_spin', icon: '🎰', label: 'Spin', price: 119, desc: 'Fortune wheel' },
-            { id: 'feature_memory', icon: '🃏', label: 'Memory', price: 109, desc: 'Card game' },
-            { id: 'feature_video', icon: '🎬', label: 'Video', price: 149, desc: 'Video message' },
-            { id: 'feature_confetti', icon: '🎊', label: 'Confetti', price: 49, desc: 'Party burst' }
+            { id: 'feature_gallery', icon: '📸', label: 'Gallery', price: 19, desc: 'Photo memories' },
+            { id: 'feature_music', icon: '🎵', label: 'Music', price: 19, desc: 'Background audio' },
+            { id: 'feature_timeline', icon: '📅', label: 'Timeline', price: 29, desc: 'Your story' },
+            { id: 'feature_quiz', icon: '❓', label: 'Quiz', price: 19, desc: 'Fun questions' },
+            { id: 'feature_gift', icon: '🎁', label: 'Gift', price: 29, desc: 'Surprise reveal' },
+            { id: 'feature_countdown', icon: '⏳', label: 'Timer', price: 9, desc: 'Countdown' },
+            { id: 'feature_password', icon: '🔐', label: 'Lock', price: 9, desc: 'PIN protect' },
+            { id: 'feature_scratch', icon: '🎟️', label: 'Scratch', price: 39, desc: 'Scratch reveal' },
+            { id: 'feature_spin', icon: '🎰', label: 'Spin', price: 39, desc: 'Fortune wheel' },
+            { id: 'feature_memory', icon: '🃏', label: 'Memory', price: 39, desc: 'Card game' },
+            { id: 'feature_video', icon: '🎬', label: 'Video', price: 49, desc: 'Video message' },
+            { id: 'feature_confetti', icon: '🎊', label: 'Confetti', price: 9, desc: 'Party burst' }
         ];
 
 
@@ -1481,7 +1481,7 @@
                 return () => window.removeEventListener('keydown', handleKeyDown);
             }, []);
 
-            const themePrice = 199;
+            const themePrice = 49;
             const featurePrice = selectedFeatures.reduce((sum, fid) => (FEATURES.find(f => f.id === fid)?.price || 0) + sum, 0);
             const totalPrice = themePrice + featurePrice;
 
@@ -1526,7 +1526,12 @@
                     });
                     const data = await res.json();
                     if (data.success) {
-                        setOrderData({ orderId: data.orderId, success: true });
+                        setOrderData({
+                            orderId: data.orderId,
+                            valentineId: data.valentineId,
+                            shareUrl: data.shareUrl,
+                            success: true
+                        });
                         setUpiModal(null);
                     }
                 } catch (e) {
@@ -1944,17 +1949,50 @@
                         </div>
                     )}
 
-                    {/* MODAL */}
+                    {/* SUCCESS MODAL WITH SHARE LINK */}
                     <div className={`modal-backdrop ${orderData ? 'open' : ''}`}>
-                        <div className="modal-card">
+                        <div className="modal-card" style={{ maxWidth: 420 }}>
                             <div style={{ fontSize: 56, marginBottom: 20 }}>🎉</div>
-                            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Order Confirmed!</h2>
-                            <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 24 }}>Your Valentine's page is ready to launch.</p>
-                            <div style={{ background: 'var(--bg-primary)', padding: 20, borderRadius: 14, marginBottom: 24, border: '1px solid var(--border)' }}>
-                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>ORDER ID</div>
-                                <div style={{ fontFamily: 'monospace', fontSize: 22, color: 'var(--accent-purple)' }}>{orderData?.orderId}</div>
+                            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Payment Confirmed!</h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>Your Valentine's page is live! Share it with your loved one:</p>
+
+                            {orderData?.shareUrl && (
+                                <div style={{ background: 'var(--bg-primary)', padding: 16, borderRadius: 14, marginBottom: 16, border: '2px solid var(--accent)' }}>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>💕 YOUR VALENTINE LINK</div>
+                                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'var(--accent)', wordBreak: 'break-all', marginBottom: 12 }}>
+                                        {window.location.origin}{orderData.shareUrl}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: 8 }}>
+                                        <button
+                                            className="btn-secondary"
+                                            style={{ flex: 1, padding: 10, fontSize: 13 }}
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(window.location.origin + orderData.shareUrl);
+                                                alert('Link copied! 💕');
+                                            }}
+                                        >
+                                            📋 Copy Link
+                                        </button>
+                                        <button
+                                            className="btn-primary"
+                                            style={{ flex: 1, padding: 10, fontSize: 13 }}
+                                            onClick={() => {
+                                                const url = window.location.origin + orderData.shareUrl;
+                                                const text = `I made something special for you! 💕\n${url}`;
+                                                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                                            }}
+                                        >
+                                            📱 WhatsApp
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div style={{ background: 'var(--bg-tertiary)', padding: 12, borderRadius: 10, marginBottom: 20 }}>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Order ID: <span style={{ color: 'var(--accent-purple)' }}>{orderData?.orderId}</span></div>
                             </div>
-                            <button className="btn-primary" onClick={() => setOrderData(null)}>Continue Editing</button>
+
+                            <button className="btn-secondary" onClick={() => setOrderData(null)} style={{ width: '100%' }}>Close</button>
                         </div>
                     </div>
 
