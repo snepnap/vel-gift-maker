@@ -1449,7 +1449,8 @@
             const [deviceFrame, setDeviceFrame] = useState('iphone');
 
             const iframeRef = useRef(null);
-            const previewUrl = `http://localhost:3000/templates/${currentTheme}/index.html`;
+            const baseUrl = window.location.origin;
+            const previewUrl = `${baseUrl}/templates/${currentTheme}/index.html`;
             const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(previewUrl)}`;
 
             useEffect(() => {
