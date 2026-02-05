@@ -455,16 +455,20 @@
 
         /* Right Panel */
         .right-panel {
-            background: var(--bg-secondary);
+            background: rgba(var(--card), 0.8);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
             border-left: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: all 0.3s;
+            transition: all 0.4s var(--transition-smooth);
+            position: relative;
+            z-index: 5;
         }
 
         .panel-header {
-            padding: 20px 24px;
+            padding: 24px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
@@ -472,15 +476,16 @@
         }
 
         .panel-title {
-            font-size: 15px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-primary);
+            letter-spacing: -0.02em;
         }
 
         .panel-subtitle {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-muted);
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         .panel-close {
@@ -493,19 +498,22 @@
             cursor: pointer;
             color: var(--text-muted);
             transition: all 0.2s;
-            background: transparent;
-            border: none;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
         }
 
         .panel-close:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
+            color: var(--text-primary);
+            background: var(--bg-glass);
         }
 
         .panel-body {
             flex: 1;
             overflow-y: auto;
-            padding: 20px 24px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .panel-body::-webkit-scrollbar {
@@ -790,6 +798,150 @@
         .effect-item:hover {
             border-color: var(--border-glow);
             transform: scale(1.05);
+        }
+
+        /* Panels & Cards */
+        .right-panel {
+            background: var(--bg-secondary);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.4s var(--transition-smooth);
+            position: relative;
+            z-index: 10;
+        }
+
+        .panel-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .panel-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .panel-body::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .panel-body::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        .card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            transition: all 0.3s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px -10px rgba(244, 63, 94, 0.2);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(244, 63, 94, 0.4);
+            opacity: 0.95;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-glass);
+            border-color: var(--text-muted);
         }
 
         .effect-item.active {
@@ -1478,12 +1630,26 @@
                 }
             },
             {
-                id: 'nature', icon: '🌿', name: 'Nature Lover',
-                desc: 'Forest and greenery',
+                id: 'v0_presentation', icon: '💎', name: 'v0 Modern Presentation',
+                desc: 'Premium multi-section design',
                 config: {
-                    message: "Like a forest finds its rain,\nI found you.\n\nOur love grows naturally, beautifully, endlessly.",
-                    theme: 'nature',
-                    features: ['feature_gallery', 'feature_music', 'feature_countdown']
+                    tagline: "To the love of my life",
+                    message: "My dearest,\n\nYou are my sun, my moon, and all my stars. Every section of this page is a small piece of our beautiful story.\n\nEternally yours.",
+                    theme: 'cosmic',
+                    reasons: [
+                        { title: "Your Smile", body: "It lights up my darkest days." },
+                        { title: "Your Kindness", body: "The way you care for everyone." },
+                        { title: "Your Support", body: "You are always there for me." },
+                        { title: "Your Laugh", body: "The sweetest sound I've heard." },
+                        { title: "Your Heart", body: "Generous, loving, and beautiful." },
+                        { title: "Your Presence", body: "Simply being near you is enough." }
+                    ],
+                    timeline: [
+                        { date: "Day We Met", title: "The Beginning", description: "The stars aligned." },
+                        { date: "First Date", title: "Coffee & Talks", description: "Endless conversations." },
+                        { date: "Today", title: "Still Falling", description: "I love you more than yesterday." }
+                    ],
+                    features: ['feature_gallery', 'feature_timeline', 'feature_confetti']
                 }
             }
         ];
@@ -1501,35 +1667,35 @@
         ];
 
         const THEMES = [
-            // APP STYLES (Unique Templates)
-            { id: 'music', template: 'universal', icon: '🎵', name: 'Melody (Spotify)', bg: '#1db954', desc: 'Music player style', config: { style: 'music', primaryColor: '#1db954' }, tags: ['cool', 'modern'] },
-            { id: 'stream', template: 'universal', icon: '🎬', name: 'Movie Night (Netflix)', bg: '#e50914', desc: 'Streaming service vibe', config: { style: 'stream', primaryColor: '#e50914' }, tags: ['cool', 'modern'] },
-            { id: 'chat', template: 'universal', icon: '💬', name: 'Love Chat', bg: '#25d366', desc: 'Messaging app style', config: { style: 'chat', primaryColor: '#25d366' }, tags: ['modern', 'fun'] },
-            { id: 'social', template: 'universal', icon: '📸', name: 'InstaLove', bg: '#d62976', desc: 'Social feed style', config: { style: 'social', primaryColor: '#d62976' }, tags: ['modern', 'fun'] },
+            // APP STYLES
+            { id: 'music', template: 'universal', icon: '🎵', name: 'Melody (Spotify)', bg: '#1db954', desc: 'Music player style', config: { style: 'dark', primaryColor: '#1db954' }, tags: ['cool', 'modern'] },
+            { id: 'stream', template: 'universal', icon: '🎬', name: 'Movie Night (Netflix)', bg: '#e50914', desc: 'Streaming service vibe', config: { style: 'dark', primaryColor: '#e50914' }, tags: ['cool', 'modern'] },
+            { id: 'chat', template: 'universal', icon: '💬', name: 'Love Chat', bg: '#25d366', desc: 'Messaging app style', config: { style: 'romantic', primaryColor: '#25d366' }, tags: ['modern', 'fun'] },
+            { id: 'social', template: 'universal', icon: '📸', name: 'InstaLove', bg: '#d62976', desc: 'Social feed style', config: { style: 'romantic', primaryColor: '#d62976' }, tags: ['modern', 'fun'] },
 
-            // UNIVERSAL STYLES (Mapped to 'universal' template)
+            // ROMANTIC STYLES
             { id: 'cosmic', template: 'universal', icon: '🪐', name: 'Cosmic Love', bg: '#0f0c29', desc: 'Magical space particles', config: { style: 'cosmic' }, tags: ['romantic', 'dark'] },
             { id: 'rose_garden', template: 'universal', icon: '🌹', name: 'Rose Garden', bg: '#e11d48', desc: 'Falling petals & bloom', config: { style: 'romantic', primaryColor: '#e11d48' }, tags: ['romantic', 'rose'] },
             { id: 'vintage', template: 'universal', icon: '📜', name: 'Vintage Letter', bg: '#d4a373', desc: 'Old paper & nostalgia', config: { style: 'vintage' }, tags: ['classy', 'chocolate'] },
-            { id: 'luxury', template: 'universal', icon: '✨', name: 'Gold Luxury', bg: '#000000', desc: 'Black & Gold elegance', config: { style: 'luxury' }, tags: ['classy', 'promise'] },
-            { id: 'cloud', template: 'universal', icon: '☁️', name: 'Lavender Haze', bg: '#a78bfa', desc: 'Soft clouds & dreams', config: { style: 'soft', primaryColor: '#a78bfa' }, tags: ['cute', 'teddy'] },
-            { id: 'sakura', template: 'universal', icon: '🌸', name: 'Sakura Season', bg: '#fbcfe8', desc: 'Japanese cherry blossoms', config: { style: 'soft', primaryColor: '#fbcfe8' }, tags: ['romantic', 'cute'] },
-            { id: 'pixel', template: 'universal', icon: '👾', name: '8-Bit Heart', bg: '#3b82f6', desc: 'Retro gaming style', config: { style: 'pixel' }, tags: ['fun', 'cool'] },
-            { id: 'polaroid', template: 'universal', icon: '🖼️', name: 'Memory Wall', bg: '#fffbeb', desc: 'Polaroid gallery focus', config: { style: 'clean' }, tags: ['photo', 'hug'] },
-            { id: 'minimal', template: 'universal', icon: '⚪', name: 'Pure Minimal', bg: '#f3f4f6', desc: 'Clean & typographic', config: { style: 'clean' }, tags: ['clean', 'propose'] },
-            { id: 'nature', template: 'universal', icon: '🌿', name: 'Enchanted Forest', bg: '#059669', desc: 'Fireflies & greenery', config: { style: 'nature' }, tags: ['nature'] },
-            { id: 'ocean', template: 'ocean', icon: '🌊', name: 'Deep Ocean', bg: '#0891b2', desc: 'Underwater bubbles', tags: ['nature'] },
-            { id: 'sunset', template: 'sunset', icon: '🌅', name: 'Sunset Blvd', bg: '#f97316', desc: 'Warm gradients', tags: ['romantic'] },
+            { id: 'luxury', template: 'universal', icon: '✨', name: 'Gold Luxury', bg: '#000000', desc: 'Black & Gold elegance', config: { style: 'dark', primaryColor: '#d4af37' }, tags: ['classy', 'promise'] },
+            { id: 'cloud', template: 'universal', icon: '☁️', name: 'Lavender Haze', bg: '#a78bfa', desc: 'Soft clouds & dreams', config: { style: 'romantic', primaryColor: '#a78bfa' }, tags: ['cute', 'teddy'] },
+            { id: 'sakura', template: 'universal', icon: '🌸', name: 'Sakura Season', bg: '#fbcfe8', desc: 'Japanese cherry blossoms', config: { style: 'romantic', primaryColor: '#fbcfe8' }, tags: ['romantic', 'cute'] },
+            { id: 'pixel', template: 'universal', icon: '👾', name: '8-Bit Heart', bg: '#3b82f6', desc: 'Retro gaming style', config: { style: 'dark', primaryColor: '#3b82f6' }, tags: ['fun', 'cool'] },
+            { id: 'polaroid', template: 'universal', icon: '🖼️', name: 'Memory Wall', bg: '#fffbeb', desc: 'Polaroid gallery focus', config: { style: 'romantic' }, tags: ['photo', 'hug'] },
+            { id: 'minimal', template: 'universal', icon: '⚪', name: 'Pure Minimal', bg: '#f3f4f6', desc: 'Clean & typographic', config: { style: 'romantic' }, tags: ['clean', 'propose'] },
+            { id: 'nature', template: 'universal', icon: '🌿', name: 'Enchanted Forest', bg: '#059669', desc: 'Fireflies & greenery', config: { style: 'dark', primaryColor: '#10b981' }, tags: ['nature'] },
+            { id: 'ocean', template: 'universal', icon: '🌊', name: 'Deep Ocean', bg: '#0891b2', desc: 'Underwater bubbles', config: { style: 'dark', primaryColor: '#06b6d4' }, tags: ['nature'] },
+            { id: 'sunset', template: 'universal', icon: '🌅', name: 'Sunset Blvd', bg: '#f97316', desc: 'Warm gradients', config: { style: 'romantic', primaryColor: '#f97316' }, tags: ['romantic'] },
 
-            // NEW THEMES 2025 - Mapped to existing templates
-            { id: 'aurora', template: 'aurora', icon: '🌌', name: 'Aurora Dream', bg: 'linear-gradient(135deg, #0f172a, #22d3ee, #f472b6)', desc: 'Northern lights magic', tags: ['romantic', 'magical', 'dark'] },
-            { id: 'underwater', template: 'ocean', icon: '🐠', name: 'Underwater Love', bg: '#006994', desc: 'Deep sea romance', tags: ['nature', 'calm', 'ocean'] },
-            { id: 'galaxy', template: 'starlight', icon: '✨', name: 'Galaxy Lovers', bg: '#1a0033', desc: 'Swirling cosmos', tags: ['cosmic', 'dark', 'romantic'] },
-            { id: 'meadow', template: 'bloom', icon: '🌼', name: 'Spring Meadow', bg: '#7cb342', desc: 'Blooming flowers', tags: ['nature', 'cheerful', 'spring'] },
-            { id: 'citynight', template: 'midnight', icon: '🌃', name: 'City Lights', bg: '#1e1e2e', desc: 'Urban skyline romance', tags: ['modern', 'urban', 'dark'] },
+            // NEW THEMES 2025
+            { id: 'aurora', template: 'universal', icon: '🌌', name: 'Aurora Dream', bg: 'linear-gradient(135deg, #0f172a, #22d3ee, #f472b6)', desc: 'Northern lights magic', config: { style: 'aurora' }, tags: ['romantic', 'magical', 'dark'] },
+            { id: 'underwater', template: 'universal', icon: '🐠', name: 'Underwater Love', bg: '#006994', desc: 'Deep sea romance', config: { style: 'dark', primaryColor: '#006994' }, tags: ['nature', 'calm', 'ocean'] },
+            { id: 'galaxy', template: 'universal', icon: '✨', name: 'Galaxy Lovers', bg: '#1a0033', desc: 'Swirling cosmos', config: { style: 'cosmic' }, tags: ['cosmic', 'dark', 'romantic'] },
+            { id: 'meadow', template: 'universal', icon: '🌼', name: 'Spring Meadow', bg: '#7cb342', desc: 'Blooming flowers', config: { style: 'romantic', primaryColor: '#84cc16' }, tags: ['nature', 'cheerful', 'spring'] },
+            { id: 'citynight', template: 'universal', icon: '🌃', name: 'City Lights', bg: '#1e1e2e', desc: 'Urban skyline romance', config: { style: 'dark', primaryColor: '#f59e0b' }, tags: ['modern', 'urban', 'dark'] },
 
-            { id: 'neon', template: 'neon', icon: '💜', name: 'Cyberpunk', bg: '#7e22ce', desc: 'Futuristic neon', tags: ['cool', 'kiss'] },
-            { id: 'midnight', template: 'midnight', icon: '🌙', name: 'Midnight', bg: '#1e293b', desc: 'Dark & simple', tags: ['dark'] }
+            { id: 'neon', template: 'universal', icon: '💜', name: 'Cyberpunk', bg: '#7e22ce', desc: 'Futuristic neon', config: { style: 'dark', primaryColor: '#a855f7' }, tags: ['cool', 'kiss'] },
+            { id: 'midnight', template: 'universal', icon: '🌙', name: 'Midnight', bg: '#1e293b', desc: 'Dark & simple', config: { style: 'dark' }, tags: ['dark'] }
         ];
 
         function App() {
@@ -1669,13 +1835,65 @@
             const generateLoveLetter = (mood) => {
                 const name = config.partnerName || 'my love';
                 const sender = config.senderName || 'Me';
-                const messages = {
-                    romantic: `My dearest ${name},\n\nEvery day with you feels like a dream I never want to wake up from. You are the beat in my heart and the light in my life.\n\nForever yours,\n${sender}`,
-                    funny: `Hey ${name}!\n\nI love you more than pizza (and that's saying a lot!). Thanks for putting up with my bad jokes and stealing my hoodies.\n\nLove,\n${sender}`,
-                    poetic: `To ${name},\n\nLike the stars guide the night, your love guides my soul. In this vast universe, finding you was my greatest destiny.\n\nEternally,\n${sender}`,
-                    short: `${name}, you make my heart smile. Happy Valentine's Day! ❤️\n\n- ${sender}`
+
+                const data = {
+                    romantic: {
+                        tagline: "To the rhythm of my heartbeat",
+                        message: `My dearest ${name},\n\nEvery day with you feels like a dream I never want to wake up from. You are the beat in my heart and the light in my life.\n\nForever yours,\n${sender}`,
+                        reasons: [
+                            { title: "Your Soul", body: "Pure, kind, and absolutely beautiful." },
+                            { title: "The Way You Look At Me", body: "It makes me feel like the luckiest person alive." },
+                            { title: "Your Kindness", body: "You care for everyone with such grace." },
+                            { title: "Our Long Talks", body: "Time stops when I am with you." },
+                            { title: "Your Strength", body: "You inspire me to be better every single day." },
+                            { title: "Your Laugh", body: "The soundtrack to my happiest moments." }
+                        ]
+                    },
+                    funny: {
+                        tagline: "My favorite weirdo",
+                        message: `Hey ${name}!\n\nI love you more than pizza (and that's saying a lot!). Thanks for putting up with my bad jokes and stealing my hoodies.\n\nLove,\n${sender}`,
+                        reasons: [
+                            { title: "Hoodie Thief", body: "You look better in my clothes anyway." },
+                            { title: "Terrible Singer", body: "I still love your car concerts." },
+                            { title: "Bad Jokes", body: "Someone has to laugh at mine." },
+                            { title: "Shared Pizzas", body: "Even if you steal the last slice." },
+                            { title: "Video Game Rival", body: "I let you win... sometimes." },
+                            { title: "The Weirdness", body: "Thank God I found someone as weird as me." }
+                        ]
+                    },
+                    poetic: {
+                        tagline: "A soul's eternal destiny",
+                        message: `To ${name},\n\nLike the stars guide the night, your love guides my soul. In this vast universe, finding you was my greatest destiny.\n\nEternally,\n${sender}`,
+                        reasons: [
+                            { title: "Starlight", body: "Your love illuminates my darkest paths." },
+                            { title: "Eternity", body: "A thousand lifetimes wouldn't be enough." },
+                            { title: "The Universe", body: "It conspired to bring our souls together." },
+                            { title: "Poetry in Motion", body: "Everything you do is a masterpiece." },
+                            { title: "Silence", body: "Even our quiet moments speak volumes." },
+                            { title: "The Future", body: "A canvas waiting for our colors." }
+                        ]
+                    },
+                    short: {
+                        tagline: "Simply everything",
+                        message: `${name}, you make my heart smile. Happy Valentine's Day! ❤️\n\n- ${sender}`,
+                        reasons: [
+                            { title: "Everything", body: "You are the reason for my happiness." },
+                            { title: "Smiles", body: "You bring them out so easily." },
+                            { title: "Warmth", body: "Your love is my favorite place." },
+                            { title: "Beauty", body: "Inside and out, you are perfect." },
+                            { title: "Home", body: "With you, I am always where I belong." },
+                            { title: "Always", body: "My heart is yours, forever." }
+                        ]
+                    }
                 };
-                setConfig({ ...config, message: messages[mood] });
+
+                const selectedData = data[mood];
+                setConfig({
+                    ...config,
+                    tagline: selectedData.tagline,
+                    message: selectedData.message,
+                    reasons: selectedData.reasons
+                });
                 setAiModalOpen(false);
                 setAutoSaveStatus('saved');
             };
@@ -1709,12 +1927,20 @@
 
 
             const [config, setConfig] = useState({
-                senderName: '', partnerName: '', message: 'My dearest...',
+                senderName: '', partnerName: '', tagline: 'To the love of my life', message: 'Every moment with you is magic...',
                 musicUrl: 'https://res.cloudinary.com/dncywqfpb/video/upload/v1738399057/music_qzh0xk.mp3',
                 giftUrl: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48',
+                reasons: [
+                    { title: "Your Smile", body: "It lights up my darkest days." },
+                    { title: "Your Kindness", body: "The way you care for everyone." },
+                    { title: "Your Support", body: "You are always there for me." },
+                    { title: "Your Laugh", body: "The sweetest sound I've heard." },
+                    { title: "Your Heart", body: "Generous, loving, and beautiful." },
+                    { title: "Your Presence", body: "Simply being near you is enough." }
+                ],
                 timeline: [
-                    { date: "2023", title: "We Met", description: "The stars aligned." },
-                    { date: "2024", title: "First Date", description: "Coffee and endless talks." }
+                    { date: "Day We Met", title: "The Beginning", description: "The stars aligned." },
+                    { date: "First Date", title: "Coffee & Talks", description: "Endless conversations." }
                 ],
                 quiz: { question: "Where was our first date?", options: ["Cafe", "Park", "Cinema", "Beach"], correctIndex: 0 },
                 gallery: [
@@ -1839,6 +2065,7 @@
 
             const toggleFeature = (id) => setSelectedFeatures(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
             const updateTimeline = (i, field, val) => { const t = [...config.timeline]; t[i][field] = val; setConfig({ ...config, timeline: t }); };
+            const updateReason = (i, field, val) => { const r = [...config.reasons]; r[i][field] = val; setConfig({ ...config, reasons: r }); };
             const updateGallery = (i, val) => { const g = [...config.gallery]; g[i] = val; setConfig({ ...config, gallery: g }); };
 
             // Enhanced applyTemplate - applies theme, features, and config
@@ -2141,6 +2368,10 @@
                                                 <input className="form-input" value={config.partnerName} onChange={e => setConfig({ ...config, partnerName: e.target.value })} placeholder="Their name" />
                                             </div>
                                             <div className="form-group">
+                                                <label className="form-label">✨ Romantic Tagline</label>
+                                                <input className="form-input" value={config.tagline} onChange={e => setConfig({ ...config, tagline: e.target.value })} placeholder="Short tagline" />
+                                            </div>
+                                            <div className="form-group">
                                                 <label className="form-label">💌 Your Name</label>
                                                 <input className="form-input" value={config.senderName} onChange={e => setConfig({ ...config, senderName: e.target.value })} placeholder="Your name" />
                                             </div>
@@ -2150,6 +2381,18 @@
                                                     <button onClick={() => setAiModalOpen(true)} style={{ fontSize: 12, padding: '6px 14px', background: 'linear-gradient(135deg,#6366f1,#a855f7)', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>✨ AI Magic Write</button>
                                                 </div>
                                                 <textarea className="form-input form-textarea" value={config.message} onChange={e => setConfig({ ...config, message: e.target.value })}></textarea>
+                                            </div>
+
+                                            <div style={{ marginTop: 20 }}>
+                                                <label className="form-label">💖 Reasons I Love You</label>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                                    {config.reasons.map((reason, i) => (
+                                                        <div key={i} className="card" style={{ padding: 12 }}>
+                                                            <input className="form-input" style={{ marginBottom: 8, fontSize: 13, fontWeight: 600 }} value={reason.title} onChange={e => updateReason(i, 'title', e.target.value)} placeholder="Title" />
+                                                            <textarea className="form-input" style={{ fontSize: 12, minHeight: 40 }} value={reason.body} onChange={e => updateReason(i, 'body', e.target.value)} placeholder="Why?"></textarea>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </>
                                     )}
