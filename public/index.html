@@ -1221,6 +1221,112 @@
             border-color: rgba(255, 255, 255, 0.1);
             color: var(--text-primary);
         }
+
+        /* Valentine Week Mode Styles */
+        .week-mode-bar {
+            display: flex;
+            gap: 8px;
+            padding: 16px 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .week-mode-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .week-day {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 68px;
+            padding: 12px 8px;
+            border-radius: 14px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .week-day::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .week-day:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border-color: var(--border-glow);
+            background: var(--bg-glass);
+        }
+
+        .week-day:hover::before {
+            opacity: 1;
+        }
+
+        .week-day.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(244, 63, 94, 0.4);
+            border-color: transparent;
+            transform: scale(1.05);
+        }
+
+        .week-day .label {
+            font-size: 11px;
+            margin-top: 4px;
+            opacity: 0.8;
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .week-day.active .label {
+            opacity: 1;
+            font-weight: 600;
+        }
+
+        /* Modern Theme Card Enhancements */
+        .theme-card {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .theme-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .theme-card:hover::after {
+            opacity: 1;
+        }
+
+        .theme-card.active::after {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -1382,6 +1488,14 @@
             { id: 'nature', template: 'universal', icon: '🌿', name: 'Enchanted Forest', bg: '#059669', desc: 'Fireflies & greenery', config: { style: 'nature' }, tags: ['nature'] },
             { id: 'ocean', template: 'universal', icon: '🌊', name: 'Deep Ocean', bg: '#0891b2', desc: 'Underwater bubbles', config: { style: 'ocean' }, tags: ['nature'] },
             { id: 'sunset', template: 'universal', icon: '🌅', name: 'Sunset Blvd', bg: '#f97316', desc: 'Warm gradients', config: { style: 'gradient' }, tags: ['romantic'] },
+
+            // NEW THEMES (Phase 2)
+            { id: 'aurora', template: 'universal', icon: '🌌', name: 'Aurora Dream', bg: 'linear-gradient(135deg, #0f172a, #22d3ee, #f472b6)', desc: 'Northern lights magic', config: { style: 'aurora' }, tags: ['romantic', 'magical', 'dark'] },
+            { id: 'underwater', template: 'universal', icon: '🐠', name: 'Underwater Love', bg: '#006994', desc: 'Deep sea romance', config: { style: 'underwater' }, tags: ['nature', 'calm', 'ocean'] },
+            { id: 'galaxy', template: 'universal', icon: '✨', name: 'Galaxy Lovers', bg: '#1a0033', desc: 'Swirling cosmos', config: { style: 'galaxy' }, tags: ['cosmic', 'dark', 'romantic'] },
+            { id: 'meadow', template: 'universal', icon: '🌼', name: 'Spring Meadow', bg: '#7cb342', desc: 'Blooming flowers', config: { style: 'meadow' }, tags: ['nature', 'cheerful', 'spring'] },
+            { id: 'citynight', template: 'universal', icon: '🌃', name: 'City Lights', bg: '#1e1e2e', desc: 'Urban skyline romance', config: { style: 'citynight' }, tags: ['modern', 'urban', 'dark'] },
+
             { id: 'neon', template: 'neon', icon: '💜', name: 'Cyberpunk', bg: '#7e22ce', desc: 'Futuristic neon', tags: ['cool', 'kiss'] },
             { id: 'midnight', template: 'midnight', icon: '🌙', name: 'Midnight', bg: '#1e293b', desc: 'Dark & simple', tags: ['dark'] }
         ];
