@@ -1343,6 +1343,20 @@
             }
         ];
 
+        const VALENTINE_WEEK = [
+            { id: 'all', icon: '❤️', label: 'All Days' },
+            { id: 'rose', icon: '🌹', label: 'Rose Day (Feb 7)', theme: 'rose_garden' },
+            { id: 'propose', icon: '💍', label: 'Propose Day (Feb 8)', theme: 'minimal' },
+            { id: 'chocolate', icon: '🍫', label: 'Chocolate Day (Feb 9)', theme: 'vintage' },
+            { id: 'teddy', icon: '🧸', label: 'Teddy Day (Feb 10)', theme: 'cloud' },
+            { id: 'promise', icon: '🤝', label: 'Promise Day (Feb 11)', theme: 'luxury' },
+            { id: 'hug', icon: '🫂', label: 'Hug Day (Feb 12)', theme: 'polaroid' },
+            { id: 'kiss', icon: '💋', label: 'Kiss Day (Feb 13)', theme: 'neon' },
+            { id: 'valentine', icon: '💘', label: 'Valentine\'s Day (Feb 14)', theme: 'cosmic' }
+        ];
+
+
+
 
         function App() {
             const [activeSection, setActiveSection] = useState('themes');
@@ -1370,6 +1384,7 @@
 
             // V17 UI State
             const [darkMode, setDarkMode] = useState(true);
+            const [weekMode, setWeekMode] = useState('all'); // 'all', 'rose', 'propose', etc.
 
             // User Auth State
             const [currentUser, setCurrentUser] = useState(null);
@@ -1542,7 +1557,10 @@
 
             const iframeRef = useRef(null);
             const baseUrl = window.location.origin;
-            const previewUrl = `${baseUrl}/templates/${currentTheme}/index.html`;
+            // Universal Theme Logic: Map themes to 'universal' template if specified
+            const themeDef = THEMES.find(t => t.id === currentTheme);
+            const templateDir = themeDef?.template || currentTheme;
+            const previewUrl = `${baseUrl}/templates/${templateDir}/index.html`;
             const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(previewUrl)}`;
 
             useEffect(() => {
@@ -1761,616 +1779,646 @@
                         <div className={`sidebar-item ${activeSection === 'style' ? 'active' : ''}`} data-tooltip="Style" onClick={() => setActiveSection('style')}>🎭</div>
                         <div className={`sidebar-item ${activeSection === 'templates' ? 'active' : ''}`} data-tooltip="Templates" onClick={() => setActiveSection('templates')}>📋</div>
                         <div className={`sidebar-item ${activeSection === 'settings' ? 'active' : ''}`} data-tooltip="Settings" onClick={() => setActiveSection('settings')}>⚙️</div>
-                        <div className="sidebar-spacer"></div>
-                        <div className="sidebar-item" data-tooltip={darkMode ? 'Light Mode' : 'Dark Mode'} onClick={() => setDarkMode(!darkMode)}>{darkMode ? '🌙' : '☀️'}</div>
-                        <div className="sidebar-item" data-tooltip="Shortcuts" onClick={() => alert('⌘P: Preview Mode\n⌘S: Publish')}>⌨️</div>
                     </div>
 
-
-                    {/* CANVAS */}
-                    <div className="canvas-area">
-                        <div className="canvas-pattern"></div>
-                        <div className="toolbar">
-                            <button className={`toolbar-btn ${mode === 'desktop' ? 'active' : ''}`} onClick={() => setMode('desktop')}>Desktop</button>
-                            <button className={`toolbar-btn ${mode === 'mobile' ? 'active' : ''}`} onClick={() => setMode('mobile')}>Mobile</button>
-                            {mode === 'mobile' && (
-                                <>
-                                    <div className="toolbar-divider"></div>
-                                    <button className={`toolbar-btn ${orientation === 'portrait' ? 'active' : ''}`} onClick={() => setOrientation('portrait')}>Portrait</button>
-                                    <button className={`toolbar-btn ${orientation === 'landscape' ? 'active' : ''}`} onClick={() => setOrientation('landscape')}>Landscape</button>
-                                </>
-                            )}
-                            <div className="toolbar-divider"></div>
-                            <button className="toolbar-btn" onClick={() => setZoomLevel(Math.max(50, zoomLevel - 25))}>➖</button>
-                            <span style={{ fontSize: '12px', color: '#a1a1aa', minWidth: '45px', textAlign: 'center' }}>{zoomLevel}%</span>
-                            <button className="toolbar-btn" onClick={() => setZoomLevel(Math.min(150, zoomLevel + 25))}>➕</button>
-                            <div className="toolbar-divider"></div>
-                            <button className={`toolbar-btn ${soundEnabled ? 'active' : ''}`} onClick={() => setSoundEnabled(!soundEnabled)} title="Sound Effects">{soundEnabled ? '🔊' : '🔇'}</button>
-                            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ fontSize: '11px', color: autoSaveStatus === 'saved' ? '#22c55e' : '#f59e0b' }}>{autoSaveStatus === 'saved' ? '✓ Saved' : '● Saving...'}</span>
-                            </div>
-                        </div>
-
-                        <div className="preview-container">
-                            {mode === 'desktop' ? (
-                                <div className="preview-desktop">
-                                    {loading && <div style={{ position: 'absolute', inset: 0, background: '#09090b', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}><span className="loader"></span></div>}
-                                    <iframe ref={iframeRef} src={previewUrl} style={{ width: '100%', height: '100%', border: 'none' }} onLoad={() => setTimeout(() => setLoading(false), 500)}></iframe>
-                                </div>
-                            ) : (
-                                <div className={`preview-mobile ${orientation === 'landscape' ? 'landscape' : ''}`}>
-                                    <div className="preview-screen">
-                                        {orientation === 'portrait' && <div className="notch"></div>}
-                                        {loading && <div style={{ position: 'absolute', inset: 0, background: '#09090b', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}><span className="loader"></span></div>}
-                                        <iframe ref={iframeRef} src={previewUrl} style={{ width: '100%', height: '100%', border: 'none' }} onLoad={() => setTimeout(() => setLoading(false), 500)}></iframe>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* RIGHT PANEL */}
-                    {activeSection && (
-                        <div className="right-panel">
-                            <div className="panel-header">
-                                <div>
-                                    <div className="panel-title">
-                                        {activeSection === 'orders' && '🎁 My Valentines'}
-                                        {activeSection === 'themes' && '🎨 Choose Theme'}
-                                        {activeSection === 'content' && '✍️ Edit Content'}
-                                        {activeSection === 'features' && '✨ Add Features'}
-                                        {activeSection === 'gallery' && '📸 Photo Gallery'}
-                                        {activeSection === 'timeline' && '📅 Our Story'}
-                                        {activeSection === 'style' && '🎭 Customize Style'}
-                                        {activeSection === 'templates' && '📋 Quick Templates'}
-                                        {activeSection === 'settings' && '⚙️ Settings'}
-                                    </div>
-                                    <div className="panel-subtitle">
-                                        {activeSection === 'orders' && 'Your purchase history & links'}
-                                        {activeSection === 'themes' && '6 premium themes available'}
-                                        {activeSection === 'style' && 'Colors, fonts & animations'}
-                                        {activeSection === 'templates' && 'One-click setup'}
-                                    </div>
-                                </div>
-                                <button className="panel-close" onClick={() => setActiveSection(null)}>✕</button>
-                            </div>
-                            <div className="panel-body">
-
-                                {/* MY ORDERS SECTION */}
-                                {activeSection === 'orders' && (
-                                    <div className="orders-list" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                                        {!currentUser ? (
-                                            <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>
-                                                <div style={{ fontSize: 40, marginBottom: 10 }}>🔒</div>
-                                                <p>Please login to view your gifts.</p>
-                                                <button className="btn-primary" onClick={() => setAuthModal('login')} style={{ marginTop: 20 }}>Login</button>
-                                            </div>
-                                        ) : loadingOrders ? (
-                                            <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}><span className="loader"></span></div>
-                                        ) : myOrders.length === 0 ? (
-                                            <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>
-                                                <div style={{ fontSize: 40, marginBottom: 10 }}>💝</div>
-                                                <p>You haven't created any valentines yet.</p>
-                                                <button className="btn-primary" onClick={() => setActiveSection('themes')} style={{ marginTop: 20 }}>Create One Now</button>
-                                            </div>
-                                        ) : (
-                                            myOrders.map(order => (
-                                                <div key={order.orderId} className="card" style={{ padding: 16, border: order.status === 'paid' ? '1px solid var(--accent)' : '1px solid var(--border)' }}>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                                                        <div style={{ fontWeight: 600, color: 'white' }}>{order.config?.partnerName || 'Valentine'}</div>
-                                                        <span style={{
-                                                            fontSize: 10, padding: '4px 8px', borderRadius: 10,
-                                                            background: order.status === 'paid' ? '#22c55e' : (order.status === 'awaiting_verification' ? '#f59e0b' : '#ef4444'),
-                                                            color: '#000'
-                                                        }}>
-                                                            {order.status === 'paid' ? 'Active' : (order.status === 'awaiting_verification' ? 'Pending' : 'Unpaid')}
-                                                        </span>
-                                                    </div>
-                                                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                            <span>To: {order.config?.partnerName || 'My Love'}</span>
-                                                            <span>₹{order.amount}</span>
-                                                        </div>
-                                                        Theme: {THEMES.find(t => t.id === order.theme)?.name || order.theme}<br />
-                                                        Date: {new Date(order.createdAt).toLocaleDateString()}
-                                                    </div>
-
-                                                    {order.status === 'paid' && order.valentineId && (
-                                                        <div style={{ display: 'flex', gap: 8 }}>
-                                                            <button className="btn-secondary" style={{ flex: 1, fontSize: 12 }} onClick={() => window.open(`/v/${order.valentineId}`, '_blank')}>View</button>
-                                                            <button className="btn-secondary" style={{ flex: 1, fontSize: 12 }} onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/v/${order.valentineId}`); alert('Link copied!'); }}>Copy Link</button>
-                                                        </div>
-                                                    )}
-
-                                                    {order.status === 'awaiting_verification' && (
-                                                        <button
-                                                            className="btn-secondary"
-                                                            style={{ width: '100%', fontSize: 12, color: '#f59e0b' }}
-                                                            onClick={() => window.open(`https://wa.me/918709157822?text=Hi! checking status for Order: ${order.orderId}`, '_blank')}
-                                                        >
-                                                            ⏳ Check Status on WhatsApp
-                                                        </button>
-                                                    )}
-
-                                                    {order.status === 'pending' && (
-                                                        <div style={{ fontSize: 11, color: '#ef4444', textAlign: 'center' }}>Payment not completed</div>
-                                                    )}
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                )}
-
-                                {/* THEMES SECTION */}
-                                {activeSection === 'themes' && (
-                                    <div className="theme-grid">
-                                        {THEMES.map(theme => (
-                                            <div key={theme.id} className={`theme-card ${currentTheme === theme.id ? 'active' : ''}`} onClick={() => setCurrentTheme(theme.id)}>
-                                                <div className="theme-card-bg" style={{ background: theme.bg }}></div>
-                                                <div className="theme-card-info">
-                                                    <span className="theme-card-name">{theme.emoji} {theme.name}</span>
-                                                </div>
-                                                {currentTheme === theme.id && <div className="theme-card-badge">Active</div>}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* CONTENT SECTION */}
-                                {activeSection === 'content' && (
-                                    <>
-                                        <div className="form-group">
-                                            <label className="form-label">❤️ Partner's Name</label>
-                                            <input className="form-input" value={config.partnerName} onChange={e => setConfig({ ...config, partnerName: e.target.value })} placeholder="Their name" />
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="form-label">💌 Your Name</label>
-                                            <input className="form-input" value={config.senderName} onChange={e => setConfig({ ...config, senderName: e.target.value })} placeholder="Your name" />
-                                        </div>
-                                        <div className="form-group">
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                                                <label className="form-label" style={{ margin: 0 }}>💕 Love Letter</label>
-                                                <button onClick={() => setAiModalOpen(true)} style={{ fontSize: 12, padding: '6px 14px', background: 'linear-gradient(135deg,#6366f1,#a855f7)', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>✨ AI Magic Write</button>
-                                            </div>
-                                            <textarea className="form-input form-textarea" value={config.message} onChange={e => setConfig({ ...config, message: e.target.value })}></textarea>
-                                        </div>
-                                    </>
-                                )}
-
-                                {/* FEATURES SECTION */}
-                                {activeSection === 'features' && (
-                                    <>
-                                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>Select features to include in your Valentine's page.</p>
-                                        <div className="feature-grid">
-                                            {FEATURES.map(f => (
-                                                <div key={f.id} className={`feature-item ${selectedFeatures.includes(f.id) ? 'active' : ''}`} onClick={() => toggleFeature(f.id)}>
-                                                    <div className="icon">{f.icon}</div>
-                                                    <div className="name">{f.label}</div>
-                                                    <div className="price">₹{f.price}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        {/* Music Upload */}
-                                        {selectedFeatures.includes('feature_music') && (
-                                            <div className="card" style={{ marginTop: 20, padding: 16 }}>
-                                                <div className="form-label">🎵 Background Music</div>
-                                                <input className="form-input" style={{ marginBottom: 10 }} value={config.musicUrl} onChange={(e) => setConfig({ ...config, musicUrl: e.target.value })} placeholder="Paste music URL..." />
-                                                <div style={{ display: 'flex', gap: 10 }}>
-                                                    <label style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', background: 'var(--bg-primary)', border: '1px dashed var(--border)', borderRadius: 10, cursor: 'pointer', color: 'var(--accent)', fontSize: 12 }}>
-                                                        <input type="file" accept="audio/*" style={{ display: 'none' }} onChange={handleMusicUpload} />
-                                                        📤 Upload
-                                                    </label>
-                                                    <button onClick={toggleRecording} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', background: isRecording ? '#ef4444' : 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 10, cursor: 'pointer', color: isRecording ? 'white' : 'var(--accent)', fontSize: 12 }}>
-                                                        {isRecording ? '⏹ Stop' : '🎤 Record Voice'}
-                                                    </button>
-                                                </div>
-                                                {config.musicUrl && config.musicUrl.startsWith('data:') && <p style={{ fontSize: 11, color: '#22c55e', marginTop: 8 }}>✓ Audio loaded</p>}
-                                            </div>
-                                        )}
-
-                                        {/* Gift Upload */}
-                                        {selectedFeatures.includes('feature_gift') && (
-                                            <div className="card" style={{ marginTop: 12, padding: 16 }}>
-                                                <div className="form-label">🎁 Gift Image</div>
-                                                <input className="form-input" style={{ marginBottom: 10 }} value={config.giftUrl} onChange={(e) => setConfig({ ...config, giftUrl: e.target.value })} placeholder="Paste gift image URL..." />
-                                                <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 16px', background: 'var(--bg-primary)', border: '1px dashed var(--border)', borderRadius: 10, cursor: 'pointer', color: 'var(--accent)', fontSize: 13 }}>
-                                                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleGiftUpload} />
-                                                    📤 Upload Gift Image
-                                                </label>
-                                                {config.giftUrl && <div style={{ marginTop: 10, borderRadius: 10, overflow: 'hidden', maxWidth: 120 }}><img src={config.giftUrl} style={{ width: '100%', height: 80, objectFit: 'cover' }} /></div>}
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-
-
-                                {/* GALLERY SECTION */}
-                                {activeSection === 'gallery' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                                        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Upload photos from your device or paste URLs</p>
-                                        {config.gallery.map((url, i) => (
-                                            <div key={i} className="card" style={{ display: 'flex', gap: 12, alignItems: 'center', padding: 12 }}>
-                                                <div style={{ width: 60, height: 60, borderRadius: 10, background: '#1a1a1a', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
-                                                    {url && <img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-                                                    {!url && <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: 20 }}>📷</span>}
-                                                </div>
-                                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                                    <input className="form-input" style={{ marginBottom: 0, fontSize: 12 }} value={url} onChange={e => updateGallery(i, e.target.value)} placeholder="Paste image URL..." />
-                                                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--accent)', cursor: 'pointer' }}>
-                                                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e, i)} />
-                                                        📤 Upload from device
-                                                    </label>
-                                                </div>
-                                                <button style={{ width: 32, height: 32, borderRadius: 8, background: 'transparent', border: '1px solid var(--border)', color: '#ef4444', cursor: 'pointer', fontSize: 16 }} onClick={() => removeGalleryImage(i)}>×</button>
-                                            </div>
-                                        ))}
-                                        <div style={{ display: 'flex', gap: 10 }}>
-                                            <button className="btn-secondary" style={{ flex: 1 }} onClick={addGallerySlot}>+ Add Photo Slot</button>
-                                            <label className="btn-secondary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                                                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e)} />
-                                                📤 Upload New
-                                            </label>
-                                        </div>
-                                    </div>
-                                )}
-
-
-                                {/* TIMELINE SECTION */}
-                                {activeSection === 'timeline' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                        {config.timeline.map((item, i) => (
-                                            <div key={i} className="card">
-                                                <div className="form-group" style={{ marginBottom: 12 }}><input className="form-input" value={item.title} onChange={e => updateTimeline(i, 'title', e.target.value)} placeholder="Event title" /></div>
-                                                <div className="form-group" style={{ marginBottom: 12 }}><input className="form-input" value={item.date} onChange={e => updateTimeline(i, 'date', e.target.value)} placeholder="Date" /></div>
-                                                <textarea className="form-input" style={{ minHeight: 70, resize: 'none' }} value={item.description} onChange={e => updateTimeline(i, 'description', e.target.value)} placeholder="Description..."></textarea>
-                                            </div>
-                                        ))}
-                                        <button className="btn-secondary" onClick={() => setConfig({ ...config, timeline: [...config.timeline, { date: "Year", title: "New Event", description: "..." }] })}>+ Add Event</button>
-                                    </div>
-                                )}
-
-                                {/* STYLE SECTION */}
-                                {activeSection === 'style' && (
-                                    <>
-                                        <div className="form-group">
-                                            <label className="form-label">🎨 Accent Color</label>
-                                            <div className="color-grid">
-                                                {COLORS.map(c => (
-                                                    <div key={c.id} className={`color-swatch ${accentColor === c.id ? 'active' : ''}`} style={{ background: c.color }} onClick={() => setAccentColor(c.id)} title={c.name}></div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label className="form-label">🔤 Font Style</label>
-                                            {FONTS.map(f => (
-                                                <div key={f.id} className={`font-option ${selectedFont === f.id ? 'active' : ''}`} onClick={() => setSelectedFont(f.id)}>
-                                                    <span className="font-preview" style={{ fontFamily: f.style }}>{f.preview}</span>
-                                                    <span className="font-name">{f.name}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label className="form-label">✨ Animation Intensity</label>
-                                            <div className="slider-container">
-                                                <input type="range" className="slider" min="1" max="3" value={animationLevel} onChange={e => setAnimationLevel(parseInt(e.target.value))} />
-                                                <div className="slider-labels">
-                                                    <span>Subtle</span>
-                                                    <span>Medium</span>
-                                                    <span>Maximum</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-
-                                {/* TEMPLATES SECTION */}
-                                {activeSection === 'templates' && (
-                                    <div className="template-grid">
-                                        {TEMPLATES.map(t => (
-                                            <div key={t.id} className="template-card" onClick={() => applyTemplate(t)}>
-                                                <div className="template-card-header">
-                                                    <span className="template-card-icon">{t.icon}</span>
-                                                    <span className="template-card-title">{t.name}</span>
-                                                </div>
-                                                <p className="template-card-desc">{t.desc}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* SETTINGS SECTION */}
-                                {activeSection === 'settings' && (
-                                    <>
-                                        {/* Animation Effects */}
-                                        <div className="form-group">
-                                            <label className="form-label">✨ Animation Effects</label>
-                                            <div className="effects-grid">
-                                                <div className={`effect-item ${config.effects?.hearts ? 'active' : ''}`} onClick={() => setConfig({ ...config, effects: { ...config.effects, hearts: !config.effects?.hearts } })}>
-                                                    <span className="icon">💕</span>
-                                                    <span>Hearts</span>
-                                                </div>
-                                                <div className={`effect-item ${config.effects?.sparkles ? 'active' : ''}`} onClick={() => setConfig({ ...config, effects: { ...config.effects, sparkles: !config.effects?.sparkles } })}>
-                                                    <span className="icon">✨</span>
-                                                    <span>Sparkles</span>
-                                                </div>
-                                                <div className={`effect-item ${config.effects?.bubbles ? 'active' : ''}`} onClick={() => setConfig({ ...config, effects: { ...config.effects, bubbles: !config.effects?.bubbles } })}>
-                                                    <span className="icon">🫧</span>
-                                                    <span>Bubbles</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Password Lock */}
-                                        <div className="form-group">
-                                            <label className="form-label">🔐 Password Lock</label>
-                                            <input type="password" className="form-input" style={{ textAlign: 'center', letterSpacing: '0.4em', fontSize: 20 }} value={config.password} onChange={e => setConfig({ ...config, password: e.target.value })} placeholder="••••" maxLength={6} />
-                                        </div>
-
-                                        {/* Share & Export */}
-                                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 24, marginTop: 12 }}>
-                                            <label className="form-label">📤 Share & Export</label>
-                                            <div className="share-buttons" style={{ marginBottom: 12 }}>
-                                                <button className="share-btn whatsapp" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('Check out my Valentine! ' + previewUrl)}`)}>
-                                                    💬 WhatsApp
-                                                </button>
-                                                <button className="share-btn copy" onClick={() => { navigator.clipboard.writeText(previewUrl); alert('Link copied!'); }}>
-                                                    📋 Copy
-                                                </button>
-                                            </div>
-                                            <button className="share-btn download" style={{ width: '100%' }} onClick={() => alert('Download feature coming soon!')}>
-                                                📥 Download as Image
-                                            </button>
-                                        </div>
-
-                                        {/* QR Code */}
-                                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 24, marginTop: 24 }}>
-                                            <label className="form-label">📱 Share via QR</label>
-                                            <div style={{ background: 'white', padding: 20, borderRadius: 16, display: 'flex', justifyContent: 'center' }}><img src={qrCodeUrl} style={{ width: 140, height: 140 }} /></div>
-                                            <p style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', marginTop: 12, wordBreak: 'break-all' }}>{previewUrl}</p>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-
-                            <div className="publish-area">
-                                <button className="btn-primary" onClick={handleCheckout}>
-                                    🚀 Publish — ₹{totalPrice}
-                                </button>
-                                <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 12 }}>
-                                    <span className="kbd">⌘S</span>
-                                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>to publish</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* SUCCESS / PENDING MODAL */}
-                    <div className={`modal-backdrop ${orderData ? 'open' : ''}`}>
-                        <div className="modal-card" style={{ maxWidth: 420 }}>
-                            {/* PENDING VERIFICATION */}
-                            {orderData?.pending ? (
-                                <>
-                                    <div style={{ fontSize: 56, marginBottom: 20 }}>⏳</div>
-                                    <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Payment Submitted!</h2>
-                                    <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>
-                                        Your payment is being verified. You'll receive your Valentine link soon!
-                                    </p>
-
-                                    <div style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid #22c55e', padding: 16, borderRadius: 14, marginBottom: 16 }}>
-                                        <div style={{ fontSize: 13, color: '#22c55e', fontWeight: 600, marginBottom: 8 }}>✅ What happens next?</div>
-                                        <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                                            1. We verify your payment (1-2 hours)<br />
-                                            2. Your Valentine link is generated<br />
-                                            3. Contact us on WhatsApp for instant delivery!
-                                        </div>
-                                    </div>
-
-                                    <div style={{ background: 'var(--bg-tertiary)', padding: 12, borderRadius: 10, marginBottom: 16 }}>
-                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>Order ID (save this!)</div>
-                                        <div style={{ fontFamily: 'monospace', fontSize: 16, color: 'var(--accent-purple)' }}>{orderData?.orderId}</div>
-                                    </div>
-
-                                    <button
-                                        className="btn-primary"
-                                        onClick={() => window.open(`https://wa.me/918709157822?text=Hi! I just paid for Order: ${orderData?.orderId}. Please verify my payment.`, '_blank')}
-                                        style={{ width: '100%', marginBottom: 10 }}
-                                    >
-                                        📱 WhatsApp for Instant Link
-                                    </button>
-                                    <button className="btn-secondary" onClick={() => setOrderData(null)} style={{ width: '100%' }}>Close</button>
-                                </>
-                            ) : orderData?.success ? (
-                                <>
-                                    {/* VERIFIED - SHOW SHARE LINK */}
-                                    <div style={{ fontSize: 56, marginBottom: 20 }}>🎉</div>
-                                    <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Payment Verified!</h2>
-                                    <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>Your Valentine's page is live! Share it with your loved one:</p>
-
-                                    {orderData?.shareUrl && (
-                                        <div style={{ background: 'var(--bg-primary)', padding: 16, borderRadius: 14, marginBottom: 16, border: '2px solid var(--accent)' }}>
-                                            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>💕 YOUR VALENTINE LINK</div>
-                                            <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'var(--accent)', wordBreak: 'break-all', marginBottom: 12 }}>
-                                                {window.location.origin}{orderData.shareUrl}
-                                            </div>
-                                            <div style={{ display: 'flex', gap: 8 }}>
-                                                <button
-                                                    className="btn-secondary"
-                                                    style={{ flex: 1, padding: 10, fontSize: 13 }}
-                                                    onClick={() => {
-                                                        navigator.clipboard.writeText(window.location.origin + orderData.shareUrl);
-                                                        alert('Link copied! 💕');
-                                                    }}
-                                                >
-                                                    📋 Copy Link
-                                                </button>
-                                                <button
-                                                    className="btn-primary"
-                                                    style={{ flex: 1, padding: 10, fontSize: 13 }}
-                                                    onClick={() => {
-                                                        const url = window.location.origin + orderData.shareUrl;
-                                                        const text = `I made something special for you! 💕\n${url}`;
-                                                        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-                                                    }}
-                                                >
-                                                    📱 WhatsApp
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <div style={{ background: 'var(--bg-tertiary)', padding: 12, borderRadius: 10, marginBottom: 20 }}>
-                                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Order ID: <span style={{ color: 'var(--accent-purple)' }}>{orderData?.orderId}</span></div>
-                                    </div>
-
-                                    <button className="btn-secondary" onClick={() => setOrderData(null)} style={{ width: '100%' }}>Close</button>
-                                </>
-                            ) : null}
-                        </div>
-                    </div>
-
-                    {/* AI MODAL */}
-                    <div className={`modal-backdrop ${aiModalOpen ? 'open' : ''}`} onClick={(e) => e.target.className.includes('modal-backdrop') && setAiModalOpen(false)}>
-                        <div className="modal-card">
-                            <div style={{ fontSize: 48, marginBottom: 16 }}>✨</div>
-                            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Magic Writer</h2>
-                            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 24 }}>Select a mood for your love letter.</p>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
-                                {['Romantic', 'Funny', 'Poetic', 'Short'].map(m => (
-                                    <button key={m} className="btn-secondary" onClick={() => generateLoveLetter(m.toLowerCase())} style={{ padding: 12 }}>{m}</button>
-                                ))}
-                            </div>
-                            <button className="btn-no" style={{ width: '100%', padding: 12, border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }} onClick={() => setAiModalOpen(false)}>Cancel</button>
-                        </div>
-                    </div>
-
-                    {/* AUTH MODAL */}
-                    {authModal && (
-                        <div className="modal-backdrop open" onClick={(e) => e.target.className.includes('modal-backdrop') && setAuthModal(null)}>
-                            <div className="modal-card" style={{ maxWidth: 380 }}>
-                                <div style={{ fontSize: 48, marginBottom: 16 }}>{authModal === 'login' ? '🔐' : '👤'}</div>
-                                <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
-                                    {authModal === 'login' ? 'Welcome Back!' : 'Create Account'}
-                                </h2>
-                                <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 20 }}>
-                                    {authModal === 'login' ? 'Login to save your valentines' : 'Sign up to save & manage valentines'}
-                                </p>
-
-                                {authError && (
-                                    <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', padding: 10, borderRadius: 8, marginBottom: 16, color: '#ef4444', fontSize: 13 }}>
-                                        {authError}
-                                    </div>
-                                )}
-
-                                <form onSubmit={(e) => {
-                                    e.preventDefault();
-                                    const form = e.target;
-                                    if (authModal === 'login') {
-                                        handleLogin(form.email.value, form.password.value);
-                                    } else {
-                                        handleRegister(form.name.value, form.email.value, form.password.value);
+                    {/* WEEK MODE SELECTOR (New) */}
+                    <div className="week-mode-bar">
+                        {VALENTINE_WEEK.map(day => (
+                            <div
+                                key={day.id}
+                                className={`week-day ${weekMode === day.id ? 'active' : ''}`}
+                                onClick={() => {
+                                    setWeekMode(day.id);
+                                    if (day.theme && day.id !== 'all') setCurrentTheme(day.theme);
+                                    // Set default message for the day
+                                    if (day.id !== 'all') {
+                                        const name = config.partnerName || 'Love';
+                                        setConfig(prev => ({ ...prev, message: `Happy ${day.label.split('(')[0].trim()} ${name}! ❤️` }));
                                     }
-                                }}>
-                                    {authModal === 'register' && (
-                                        <input name="name" className="form-input" placeholder="Your Name" required style={{ marginBottom: 10 }} />
-                                    )}
-                                    <input name="email" type="email" className="form-input" placeholder="Email" required style={{ marginBottom: 10 }} />
-                                    <input name="password" type="password" className="form-input" placeholder="Password (min 6 chars)" required minLength="6" style={{ marginBottom: 16 }} />
-
-                                    <button type="submit" className="btn-primary" disabled={authLoading} style={{ width: '100%', marginBottom: 12 }}>
-                                        {authLoading ? '...' : (authModal === 'login' ? 'Login' : 'Create Account')}
-                                    </button>
-                                </form>
-
-                                <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                                    {authModal === 'login' ? (
-                                        <>Don't have an account? <span style={{ color: 'var(--accent)', cursor: 'pointer' }} onClick={() => { setAuthModal('register'); setAuthError(''); }}>Sign Up</span></>
-                                    ) : (
-                                        <>Already have an account? <span style={{ color: 'var(--accent)', cursor: 'pointer' }} onClick={() => { setAuthModal('login'); setAuthError(''); }}>Login</span></>
-                                    )}
-                                </div>
-
-                                <button
-                                    style={{ width: '100%', padding: 12, border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', marginTop: 12 }}
-                                    onClick={() => setAuthModal(null)}
-                                >
-                                    Cancel
-                                </button>
+                                }}
+                                title={day.label}
+                            >
+                                <span style={{ fontSize: 16 }}>{day.icon}</span>
+                                <span className="label">{day.label.split(' ')[0]}</span>
                             </div>
-                        </div>
+                        ))}
+                    </div>
+                    <div className="sidebar-spacer"></div>
+                    <div className="sidebar-item" data-tooltip={darkMode ? 'Light Mode' : 'Dark Mode'} onClick={() => setDarkMode(!darkMode)}>{darkMode ? '🌙' : '☀️'}</div>
+                    <div className="sidebar-item" data-tooltip="Shortcuts" onClick={() => alert('⌘P: Preview Mode\n⌘S: Publish')}>⌨️</div>
+                </div>
+
+
+                    {/* CANVAS */ }
+            <div className="canvas-area">
+                <div className="canvas-pattern"></div>
+                <div className="toolbar">
+                    <button className={`toolbar-btn ${mode === 'desktop' ? 'active' : ''}`} onClick={() => setMode('desktop')}>Desktop</button>
+                    <button className={`toolbar-btn ${mode === 'mobile' ? 'active' : ''}`} onClick={() => setMode('mobile')}>Mobile</button>
+                    {mode === 'mobile' && (
+                        <>
+                            <div className="toolbar-divider"></div>
+                            <button className={`toolbar-btn ${orientation === 'portrait' ? 'active' : ''}`} onClick={() => setOrientation('portrait')}>Portrait</button>
+                            <button className={`toolbar-btn ${orientation === 'landscape' ? 'active' : ''}`} onClick={() => setOrientation('landscape')}>Landscape</button>
+                        </>
                     )}
-
-                    {/* UPI PAYMENT MODAL */}
-                    {upiModal && (
-                        <div className="modal-backdrop open" onClick={(e) => e.target.className.includes('modal-backdrop') && setUpiModal(null)}>
-                            <div className="modal-card" style={{ maxWidth: 400 }}>
-                                <div style={{ fontSize: 48, marginBottom: 16 }}>💳</div>
-                                <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Pay with UPI</h2>
-                                <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 16 }}>Scan QR or use UPI ID to pay</p>
-
-                                <div style={{ background: 'white', padding: 16, borderRadius: 16, marginBottom: 16 }}>
-                                    <img src={upiModal.qrUrl} alt="UPI QR" style={{ width: '100%', maxWidth: 180, margin: '0 auto', display: 'block' }} />
-                                </div>
-
-                                <div style={{ background: 'var(--bg-tertiary)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
-                                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>Amount</div>
-                                    <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--accent)' }}>₹{upiModal.amount}</div>
-                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>
-                                        UPI ID: <strong style={{ color: 'var(--text-secondary)' }}>{upiModal.upiId}</strong>
-                                    </div>
-                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
-                                        Order: <strong style={{ color: 'var(--accent-purple)' }}>{upiModal.orderId}</strong>
-                                    </div>
-                                </div>
-
-                                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>After payment, enter your UPI Transaction ID:</p>
-                                <input
-                                    id="txnInput"
-                                    className="form-input"
-                                    placeholder="e.g. 401234567890"
-                                    style={{ marginBottom: 12, textAlign: 'center', letterSpacing: '0.05em' }}
-                                />
-                                <button
-                                    className="btn-primary"
-                                    onClick={() => {
-                                        const txn = document.getElementById('txnInput').value;
-                                        if (txn.length > 5) confirmPayment(txn);
-                                        else alert('Please enter valid Transaction ID');
-                                    }}
-                                >
-                                    ✅ I've Paid - Confirm
-                                </button>
-                                <button
-                                    style={{ width: '100%', padding: 12, border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', marginTop: 8 }}
-                                    onClick={() => setUpiModal(null)}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-
-                    {/* FLOATING BOTTOM ACTION BAR */}
-                    <div className="bottom-action-bar">
-                        <div className="live-badge">
-                            <div className="live-dot"></div>
-                            Editing
-                        </div>
-                        <div className="action-divider"></div>
-                        <button className="action-btn" title="Undo">↩️ Undo</button>
-                        <button className="action-btn" title="Redo">↪️ Redo</button>
-                        <div className="action-divider"></div>
-                        <button className="action-btn" onClick={() => setMode(mode === 'desktop' ? 'mobile' : 'desktop')}>
-                            {mode === 'desktop' ? '📱' : '🖥️'} {mode === 'desktop' ? 'Mobile' : 'Desktop'}
-                        </button>
-                        <button className="action-btn primary" onClick={handleCheckout}>
-                            🚀 Publish — ₹{totalPrice}
-                        </button>
+                    <div className="toolbar-divider"></div>
+                    <button className="toolbar-btn" onClick={() => setZoomLevel(Math.max(50, zoomLevel - 25))}>➖</button>
+                    <span style={{ fontSize: '12px', color: '#a1a1aa', minWidth: '45px', textAlign: 'center' }}>{zoomLevel}%</span>
+                    <button className="toolbar-btn" onClick={() => setZoomLevel(Math.min(150, zoomLevel + 25))}>➕</button>
+                    <div className="toolbar-divider"></div>
+                    <button className={`toolbar-btn ${soundEnabled ? 'active' : ''}`} onClick={() => setSoundEnabled(!soundEnabled)} title="Sound Effects">{soundEnabled ? '🔊' : '🔇'}</button>
+                    <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '11px', color: autoSaveStatus === 'saved' ? '#22c55e' : '#f59e0b' }}>{autoSaveStatus === 'saved' ? '✓ Saved' : '● Saving...'}</span>
                     </div>
                 </div>
+
+                <div className="preview-container">
+                    {mode === 'desktop' ? (
+                        <div className="preview-desktop">
+                            {loading && <div style={{ position: 'absolute', inset: 0, background: '#09090b', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}><span className="loader"></span></div>}
+                            <iframe ref={iframeRef} src={previewUrl} style={{ width: '100%', height: '100%', border: 'none' }} onLoad={() => setTimeout(() => setLoading(false), 500)}></iframe>
+                        </div>
+                    ) : (
+                        <div className={`preview-mobile ${orientation === 'landscape' ? 'landscape' : ''}`}>
+                            <div className="preview-screen">
+                                {orientation === 'portrait' && <div className="notch"></div>}
+                                {loading && <div style={{ position: 'absolute', inset: 0, background: '#09090b', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}><span className="loader"></span></div>}
+                                <iframe ref={iframeRef} src={previewUrl} style={{ width: '100%', height: '100%', border: 'none' }} onLoad={() => setTimeout(() => setLoading(false), 500)}></iframe>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* RIGHT PANEL */ }
+            {
+                activeSection && (
+                    <div className="right-panel">
+                        <div className="panel-header">
+                            <div>
+                                <div className="panel-title">
+                                    {activeSection === 'orders' && '🎁 My Valentines'}
+                                    {activeSection === 'themes' && '🎨 Choose Theme'}
+                                    {activeSection === 'content' && '✍️ Edit Content'}
+                                    {activeSection === 'features' && '✨ Add Features'}
+                                    {activeSection === 'gallery' && '📸 Photo Gallery'}
+                                    {activeSection === 'timeline' && '📅 Our Story'}
+                                    {activeSection === 'style' && '🎭 Customize Style'}
+                                    {activeSection === 'templates' && '📋 Quick Templates'}
+                                    {activeSection === 'settings' && '⚙️ Settings'}
+                                </div>
+                                <div className="panel-subtitle">
+                                    {activeSection === 'orders' && 'Your purchase history & links'}
+                                    {activeSection === 'themes' && '6 premium themes available'}
+                                    {activeSection === 'style' && 'Colors, fonts & animations'}
+                                    {activeSection === 'templates' && 'One-click setup'}
+                                </div>
+                            </div>
+                            <button className="panel-close" onClick={() => setActiveSection(null)}>✕</button>
+                        </div>
+                        <div className="panel-body">
+
+                            {/* MY ORDERS SECTION */}
+                            {activeSection === 'orders' && (
+                                <div className="orders-list" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                    {!currentUser ? (
+                                        <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>
+                                            <div style={{ fontSize: 40, marginBottom: 10 }}>🔒</div>
+                                            <p>Please login to view your gifts.</p>
+                                            <button className="btn-primary" onClick={() => setAuthModal('login')} style={{ marginTop: 20 }}>Login</button>
+                                        </div>
+                                    ) : loadingOrders ? (
+                                        <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}><span className="loader"></span></div>
+                                    ) : myOrders.length === 0 ? (
+                                        <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>
+                                            <div style={{ fontSize: 40, marginBottom: 10 }}>💝</div>
+                                            <p>You haven't created any valentines yet.</p>
+                                            <button className="btn-primary" onClick={() => setActiveSection('themes')} style={{ marginTop: 20 }}>Create One Now</button>
+                                        </div>
+                                    ) : (
+                                        myOrders.map(order => (
+                                            <div key={order.orderId} className="card" style={{ padding: 16, border: order.status === 'paid' ? '1px solid var(--accent)' : '1px solid var(--border)' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                                                    <div style={{ fontWeight: 600, color: 'white' }}>{order.config?.partnerName || 'Valentine'}</div>
+                                                    <span style={{
+                                                        fontSize: 10, padding: '4px 8px', borderRadius: 10,
+                                                        background: order.status === 'paid' ? '#22c55e' : (order.status === 'awaiting_verification' ? '#f59e0b' : '#ef4444'),
+                                                        color: '#000'
+                                                    }}>
+                                                        {order.status === 'paid' ? 'Active' : (order.status === 'awaiting_verification' ? 'Pending' : 'Unpaid')}
+                                                    </span>
+                                                </div>
+                                                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                        <span>To: {order.config?.partnerName || 'My Love'}</span>
+                                                        <span>₹{order.amount}</span>
+                                                    </div>
+                                                    Theme: {THEMES.find(t => t.id === order.theme)?.name || order.theme}<br />
+                                                    Date: {new Date(order.createdAt).toLocaleDateString()}
+                                                </div>
+
+                                                {order.status === 'paid' && order.valentineId && (
+                                                    <div style={{ display: 'flex', gap: 8 }}>
+                                                        <button className="btn-secondary" style={{ flex: 1, fontSize: 12 }} onClick={() => window.open(`/v/${order.valentineId}`, '_blank')}>View</button>
+                                                        <button className="btn-secondary" style={{ flex: 1, fontSize: 12 }} onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/v/${order.valentineId}`); alert('Link copied!'); }}>Copy Link</button>
+                                                    </div>
+                                                )}
+
+                                                {order.status === 'awaiting_verification' && (
+                                                    <button
+                                                        className="btn-secondary"
+                                                        style={{ width: '100%', fontSize: 12, color: '#f59e0b' }}
+                                                        onClick={() => window.open(`https://wa.me/918709157822?text=Hi! checking status for Order: ${order.orderId}`, '_blank')}
+                                                    >
+                                                        ⏳ Check Status on WhatsApp
+                                                    </button>
+                                                )}
+
+                                                {order.status === 'pending' && (
+                                                    <div style={{ fontSize: 11, color: '#ef4444', textAlign: 'center' }}>Payment not completed</div>
+                                                )}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
+
+                            {/* THEMES SECTION */}
+                            {activeSection === 'themes' && (
+                                <div className="theme-grid">
+                                    {THEMES.filter(t => weekMode === 'all' || t.tags?.includes(weekMode) || t.id === VALENTINE_WEEK.find(d => d.id === weekMode)?.theme).map(theme => (
+                                        <div key={theme.id} className={`theme-card ${currentTheme === theme.id ? 'active' : ''}`} onClick={() => setCurrentTheme(theme.id)}>
+                                            <div className="theme-card-bg" style={{ background: theme.bg }}></div>
+                                            <div className="theme-card-info">
+                                                <span className="theme-card-name">{theme.icon} {theme.name}</span>
+                                            </div>
+                                            {currentTheme === theme.id && <div className="theme-card-badge">Active</div>}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* CONTENT SECTION */}
+                            {activeSection === 'content' && (
+                                <>
+                                    <div className="form-group">
+                                        <label className="form-label">❤️ Partner's Name</label>
+                                        <input className="form-input" value={config.partnerName} onChange={e => setConfig({ ...config, partnerName: e.target.value })} placeholder="Their name" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">💌 Your Name</label>
+                                        <input className="form-input" value={config.senderName} onChange={e => setConfig({ ...config, senderName: e.target.value })} placeholder="Your name" />
+                                    </div>
+                                    <div className="form-group">
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                                            <label className="form-label" style={{ margin: 0 }}>💕 Love Letter</label>
+                                            <button onClick={() => setAiModalOpen(true)} style={{ fontSize: 12, padding: '6px 14px', background: 'linear-gradient(135deg,#6366f1,#a855f7)', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>✨ AI Magic Write</button>
+                                        </div>
+                                        <textarea className="form-input form-textarea" value={config.message} onChange={e => setConfig({ ...config, message: e.target.value })}></textarea>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* FEATURES SECTION */}
+                            {activeSection === 'features' && (
+                                <>
+                                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>Select features to include in your Valentine's page.</p>
+                                    <div className="feature-grid">
+                                        {FEATURES.map(f => (
+                                            <div key={f.id} className={`feature-item ${selectedFeatures.includes(f.id) ? 'active' : ''}`} onClick={() => toggleFeature(f.id)}>
+                                                <div className="icon">{f.icon}</div>
+                                                <div className="name">{f.label}</div>
+                                                <div className="price">₹{f.price}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Music Upload */}
+                                    {selectedFeatures.includes('feature_music') && (
+                                        <div className="card" style={{ marginTop: 20, padding: 16 }}>
+                                            <div className="form-label">🎵 Background Music</div>
+                                            <input className="form-input" style={{ marginBottom: 10 }} value={config.musicUrl} onChange={(e) => setConfig({ ...config, musicUrl: e.target.value })} placeholder="Paste music URL..." />
+                                            <div style={{ display: 'flex', gap: 10 }}>
+                                                <label style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', background: 'var(--bg-primary)', border: '1px dashed var(--border)', borderRadius: 10, cursor: 'pointer', color: 'var(--accent)', fontSize: 12 }}>
+                                                    <input type="file" accept="audio/*" style={{ display: 'none' }} onChange={handleMusicUpload} />
+                                                    📤 Upload
+                                                </label>
+                                                <button onClick={toggleRecording} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', background: isRecording ? '#ef4444' : 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 10, cursor: 'pointer', color: isRecording ? 'white' : 'var(--accent)', fontSize: 12 }}>
+                                                    {isRecording ? '⏹ Stop' : '🎤 Record Voice'}
+                                                </button>
+                                            </div>
+                                            {config.musicUrl && config.musicUrl.startsWith('data:') && <p style={{ fontSize: 11, color: '#22c55e', marginTop: 8 }}>✓ Audio loaded</p>}
+                                        </div>
+                                    )}
+
+                                    {/* Gift Upload */}
+                                    {selectedFeatures.includes('feature_gift') && (
+                                        <div className="card" style={{ marginTop: 12, padding: 16 }}>
+                                            <div className="form-label">🎁 Gift Image</div>
+                                            <input className="form-input" style={{ marginBottom: 10 }} value={config.giftUrl} onChange={(e) => setConfig({ ...config, giftUrl: e.target.value })} placeholder="Paste gift image URL..." />
+                                            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 16px', background: 'var(--bg-primary)', border: '1px dashed var(--border)', borderRadius: 10, cursor: 'pointer', color: 'var(--accent)', fontSize: 13 }}>
+                                                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleGiftUpload} />
+                                                📤 Upload Gift Image
+                                            </label>
+                                            {config.giftUrl && <div style={{ marginTop: 10, borderRadius: 10, overflow: 'hidden', maxWidth: 120 }}><img src={config.giftUrl} style={{ width: '100%', height: 80, objectFit: 'cover' }} /></div>}
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+
+                            {/* GALLERY SECTION */}
+                            {activeSection === 'gallery' && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Upload photos from your device or paste URLs</p>
+                                    {config.gallery.map((url, i) => (
+                                        <div key={i} className="card" style={{ display: 'flex', gap: 12, alignItems: 'center', padding: 12 }}>
+                                            <div style={{ width: 60, height: 60, borderRadius: 10, background: '#1a1a1a', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
+                                                {url && <img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                                                {!url && <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: 20 }}>📷</span>}
+                                            </div>
+                                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                                <input className="form-input" style={{ marginBottom: 0, fontSize: 12 }} value={url} onChange={e => updateGallery(i, e.target.value)} placeholder="Paste image URL..." />
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--accent)', cursor: 'pointer' }}>
+                                                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e, i)} />
+                                                    📤 Upload from device
+                                                </label>
+                                            </div>
+                                            <button style={{ width: 32, height: 32, borderRadius: 8, background: 'transparent', border: '1px solid var(--border)', color: '#ef4444', cursor: 'pointer', fontSize: 16 }} onClick={() => removeGalleryImage(i)}>×</button>
+                                        </div>
+                                    ))}
+                                    <div style={{ display: 'flex', gap: 10 }}>
+                                        <button className="btn-secondary" style={{ flex: 1 }} onClick={addGallerySlot}>+ Add Photo Slot</button>
+                                        <label className="btn-secondary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                                            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e)} />
+                                            📤 Upload New
+                                        </label>
+                                    </div>
+                                </div>
+                            )}
+
+
+                            {/* TIMELINE SECTION */}
+                            {activeSection === 'timeline' && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                    {config.timeline.map((item, i) => (
+                                        <div key={i} className="card">
+                                            <div className="form-group" style={{ marginBottom: 12 }}><input className="form-input" value={item.title} onChange={e => updateTimeline(i, 'title', e.target.value)} placeholder="Event title" /></div>
+                                            <div className="form-group" style={{ marginBottom: 12 }}><input className="form-input" value={item.date} onChange={e => updateTimeline(i, 'date', e.target.value)} placeholder="Date" /></div>
+                                            <textarea className="form-input" style={{ minHeight: 70, resize: 'none' }} value={item.description} onChange={e => updateTimeline(i, 'description', e.target.value)} placeholder="Description..."></textarea>
+                                        </div>
+                                    ))}
+                                    <button className="btn-secondary" onClick={() => setConfig({ ...config, timeline: [...config.timeline, { date: "Year", title: "New Event", description: "..." }] })}>+ Add Event</button>
+                                </div>
+                            )}
+
+                            {/* STYLE SECTION */}
+                            {activeSection === 'style' && (
+                                <>
+                                    <div className="form-group">
+                                        <label className="form-label">🎨 Accent Color</label>
+                                        <div className="color-grid">
+                                            {COLORS.map(c => (
+                                                <div key={c.id} className={`color-swatch ${accentColor === c.id ? 'active' : ''}`} style={{ background: c.color }} onClick={() => setAccentColor(c.id)} title={c.name}></div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">🔤 Font Style</label>
+                                        {FONTS.map(f => (
+                                            <div key={f.id} className={`font-option ${selectedFont === f.id ? 'active' : ''}`} onClick={() => setSelectedFont(f.id)}>
+                                                <span className="font-preview" style={{ fontFamily: f.style }}>{f.preview}</span>
+                                                <span className="font-name">{f.name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">✨ Animation Intensity</label>
+                                        <div className="slider-container">
+                                            <input type="range" className="slider" min="1" max="3" value={animationLevel} onChange={e => setAnimationLevel(parseInt(e.target.value))} />
+                                            <div className="slider-labels">
+                                                <span>Subtle</span>
+                                                <span>Medium</span>
+                                                <span>Maximum</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* TEMPLATES SECTION */}
+                            {activeSection === 'templates' && (
+                                <div className="template-grid">
+                                    {TEMPLATES.map(t => (
+                                        <div key={t.id} className="template-card" onClick={() => applyTemplate(t)}>
+                                            <div className="template-card-header">
+                                                <span className="template-card-icon">{t.icon}</span>
+                                                <span className="template-card-title">{t.name}</span>
+                                            </div>
+                                            <p className="template-card-desc">{t.desc}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* SETTINGS SECTION */}
+                            {activeSection === 'settings' && (
+                                <>
+                                    {/* Animation Effects */}
+                                    <div className="form-group">
+                                        <label className="form-label">✨ Animation Effects</label>
+                                        <div className="effects-grid">
+                                            <div className={`effect-item ${config.effects?.hearts ? 'active' : ''}`} onClick={() => setConfig({ ...config, effects: { ...config.effects, hearts: !config.effects?.hearts } })}>
+                                                <span className="icon">💕</span>
+                                                <span>Hearts</span>
+                                            </div>
+                                            <div className={`effect-item ${config.effects?.sparkles ? 'active' : ''}`} onClick={() => setConfig({ ...config, effects: { ...config.effects, sparkles: !config.effects?.sparkles } })}>
+                                                <span className="icon">✨</span>
+                                                <span>Sparkles</span>
+                                            </div>
+                                            <div className={`effect-item ${config.effects?.bubbles ? 'active' : ''}`} onClick={() => setConfig({ ...config, effects: { ...config.effects, bubbles: !config.effects?.bubbles } })}>
+                                                <span className="icon">🫧</span>
+                                                <span>Bubbles</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Password Lock */}
+                                    <div className="form-group">
+                                        <label className="form-label">🔐 Password Lock</label>
+                                        <input type="password" className="form-input" style={{ textAlign: 'center', letterSpacing: '0.4em', fontSize: 20 }} value={config.password} onChange={e => setConfig({ ...config, password: e.target.value })} placeholder="••••" maxLength={6} />
+                                    </div>
+
+                                    {/* Share & Export */}
+                                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: 24, marginTop: 12 }}>
+                                        <label className="form-label">📤 Share & Export</label>
+                                        <div className="share-buttons" style={{ marginBottom: 12 }}>
+                                            <button className="share-btn whatsapp" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('Check out my Valentine! ' + previewUrl)}`)}>
+                                                💬 WhatsApp
+                                            </button>
+                                            <button className="share-btn copy" onClick={() => { navigator.clipboard.writeText(previewUrl); alert('Link copied!'); }}>
+                                                📋 Copy
+                                            </button>
+                                        </div>
+                                        <button className="share-btn download" style={{ width: '100%' }} onClick={() => alert('Download feature coming soon!')}>
+                                            📥 Download as Image
+                                        </button>
+                                    </div>
+
+                                    {/* QR Code */}
+                                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: 24, marginTop: 24 }}>
+                                        <label className="form-label">📱 Share via QR</label>
+                                        <div style={{ background: 'white', padding: 20, borderRadius: 16, display: 'flex', justifyContent: 'center' }}><img src={qrCodeUrl} style={{ width: 140, height: 140 }} /></div>
+                                        <p style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', marginTop: 12, wordBreak: 'break-all' }}>{previewUrl}</p>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        <div className="publish-area">
+                            <button className="btn-primary" onClick={handleCheckout}>
+                                🚀 Publish — ₹{totalPrice}
+                            </button>
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 12 }}>
+                                <span className="kbd">⌘S</span>
+                                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>to publish</span>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* SUCCESS / PENDING MODAL */ }
+            <div className={`modal-backdrop ${orderData ? 'open' : ''}`}>
+                <div className="modal-card" style={{ maxWidth: 420 }}>
+                    {/* PENDING VERIFICATION */}
+                    {orderData?.pending ? (
+                        <>
+                            <div style={{ fontSize: 56, marginBottom: 20 }}>⏳</div>
+                            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Payment Submitted!</h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>
+                                Your payment is being verified. You'll receive your Valentine link soon!
+                            </p>
+
+                            <div style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid #22c55e', padding: 16, borderRadius: 14, marginBottom: 16 }}>
+                                <div style={{ fontSize: 13, color: '#22c55e', fontWeight: 600, marginBottom: 8 }}>✅ What happens next?</div>
+                                <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                                    1. We verify your payment (1-2 hours)<br />
+                                    2. Your Valentine link is generated<br />
+                                    3. Contact us on WhatsApp for instant delivery!
+                                </div>
+                            </div>
+
+                            <div style={{ background: 'var(--bg-tertiary)', padding: 12, borderRadius: 10, marginBottom: 16 }}>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>Order ID (save this!)</div>
+                                <div style={{ fontFamily: 'monospace', fontSize: 16, color: 'var(--accent-purple)' }}>{orderData?.orderId}</div>
+                            </div>
+
+                            <button
+                                className="btn-primary"
+                                onClick={() => window.open(`https://wa.me/918709157822?text=Hi! I just paid for Order: ${orderData?.orderId}. Please verify my payment.`, '_blank')}
+                                style={{ width: '100%', marginBottom: 10 }}
+                            >
+                                📱 WhatsApp for Instant Link
+                            </button>
+                            <button className="btn-secondary" onClick={() => setOrderData(null)} style={{ width: '100%' }}>Close</button>
+                        </>
+                    ) : orderData?.success ? (
+                        <>
+                            {/* VERIFIED - SHOW SHARE LINK */}
+                            <div style={{ fontSize: 56, marginBottom: 20 }}>🎉</div>
+                            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Payment Verified!</h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>Your Valentine's page is live! Share it with your loved one:</p>
+
+                            {orderData?.shareUrl && (
+                                <div style={{ background: 'var(--bg-primary)', padding: 16, borderRadius: 14, marginBottom: 16, border: '2px solid var(--accent)' }}>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>💕 YOUR VALENTINE LINK</div>
+                                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'var(--accent)', wordBreak: 'break-all', marginBottom: 12 }}>
+                                        {window.location.origin}{orderData.shareUrl}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: 8 }}>
+                                        <button
+                                            className="btn-secondary"
+                                            style={{ flex: 1, padding: 10, fontSize: 13 }}
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(window.location.origin + orderData.shareUrl);
+                                                alert('Link copied! 💕');
+                                            }}
+                                        >
+                                            📋 Copy Link
+                                        </button>
+                                        <button
+                                            className="btn-primary"
+                                            style={{ flex: 1, padding: 10, fontSize: 13 }}
+                                            onClick={() => {
+                                                const url = window.location.origin + orderData.shareUrl;
+                                                const text = `I made something special for you! 💕\n${url}`;
+                                                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                                            }}
+                                        >
+                                            📱 WhatsApp
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div style={{ background: 'var(--bg-tertiary)', padding: 12, borderRadius: 10, marginBottom: 20 }}>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Order ID: <span style={{ color: 'var(--accent-purple)' }}>{orderData?.orderId}</span></div>
+                            </div>
+
+                            <button className="btn-secondary" onClick={() => setOrderData(null)} style={{ width: '100%' }}>Close</button>
+                        </>
+                    ) : null}
+                </div>
+            </div>
+
+            {/* AI MODAL */ }
+            <div className={`modal-backdrop ${aiModalOpen ? 'open' : ''}`} onClick={(e) => e.target.className.includes('modal-backdrop') && setAiModalOpen(false)}>
+                <div className="modal-card">
+                    <div style={{ fontSize: 48, marginBottom: 16 }}>✨</div>
+                    <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Magic Writer</h2>
+                    <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 24 }}>Select a mood for your love letter.</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+                        {['Romantic', 'Funny', 'Poetic', 'Short'].map(m => (
+                            <button key={m} className="btn-secondary" onClick={() => generateLoveLetter(m.toLowerCase())} style={{ padding: 12 }}>{m}</button>
+                        ))}
+                    </div>
+                    <button className="btn-no" style={{ width: '100%', padding: 12, border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }} onClick={() => setAiModalOpen(false)}>Cancel</button>
+                </div>
+            </div>
+
+            {/* AUTH MODAL */ }
+            {
+                authModal && (
+                    <div className="modal-backdrop open" onClick={(e) => e.target.className.includes('modal-backdrop') && setAuthModal(null)}>
+                        <div className="modal-card" style={{ maxWidth: 380 }}>
+                            <div style={{ fontSize: 48, marginBottom: 16 }}>{authModal === 'login' ? '🔐' : '👤'}</div>
+                            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
+                                {authModal === 'login' ? 'Welcome Back!' : 'Create Account'}
+                            </h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 20 }}>
+                                {authModal === 'login' ? 'Login to save your valentines' : 'Sign up to save & manage valentines'}
+                            </p>
+
+                            {authError && (
+                                <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', padding: 10, borderRadius: 8, marginBottom: 16, color: '#ef4444', fontSize: 13 }}>
+                                    {authError}
+                                </div>
+                            )}
+
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                                const form = e.target;
+                                if (authModal === 'login') {
+                                    handleLogin(form.email.value, form.password.value);
+                                } else {
+                                    handleRegister(form.name.value, form.email.value, form.password.value);
+                                }
+                            }}>
+                                {authModal === 'register' && (
+                                    <input name="name" className="form-input" placeholder="Your Name" required style={{ marginBottom: 10 }} />
+                                )}
+                                <input name="email" type="email" className="form-input" placeholder="Email" required style={{ marginBottom: 10 }} />
+                                <input name="password" type="password" className="form-input" placeholder="Password (min 6 chars)" required minLength="6" style={{ marginBottom: 16 }} />
+
+                                <button type="submit" className="btn-primary" disabled={authLoading} style={{ width: '100%', marginBottom: 12 }}>
+                                    {authLoading ? '...' : (authModal === 'login' ? 'Login' : 'Create Account')}
+                                </button>
+                            </form>
+
+                            <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                                {authModal === 'login' ? (
+                                    <>Don't have an account? <span style={{ color: 'var(--accent)', cursor: 'pointer' }} onClick={() => { setAuthModal('register'); setAuthError(''); }}>Sign Up</span></>
+                                ) : (
+                                    <>Already have an account? <span style={{ color: 'var(--accent)', cursor: 'pointer' }} onClick={() => { setAuthModal('login'); setAuthError(''); }}>Login</span></>
+                                )}
+                            </div>
+
+                            <button
+                                style={{ width: '100%', padding: 12, border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', marginTop: 12 }}
+                                onClick={() => setAuthModal(null)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* UPI PAYMENT MODAL */ }
+            {
+                upiModal && (
+                    <div className="modal-backdrop open" onClick={(e) => e.target.className.includes('modal-backdrop') && setUpiModal(null)}>
+                        <div className="modal-card" style={{ maxWidth: 400 }}>
+                            <div style={{ fontSize: 48, marginBottom: 16 }}>💳</div>
+                            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Pay with UPI</h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 16 }}>Scan QR or use UPI ID to pay</p>
+
+                            <div style={{ background: 'white', padding: 16, borderRadius: 16, marginBottom: 16 }}>
+                                <img src={upiModal.qrUrl} alt="UPI QR" style={{ width: '100%', maxWidth: 180, margin: '0 auto', display: 'block' }} />
+                            </div>
+
+                            <div style={{ background: 'var(--bg-tertiary)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
+                                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>Amount</div>
+                                <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--accent)' }}>₹{upiModal.amount}</div>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>
+                                    UPI ID: <strong style={{ color: 'var(--text-secondary)' }}>{upiModal.upiId}</strong>
+                                </div>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+                                    Order: <strong style={{ color: 'var(--accent-purple)' }}>{upiModal.orderId}</strong>
+                                </div>
+                            </div>
+
+                            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>After payment, enter your UPI Transaction ID:</p>
+                            <input
+                                id="txnInput"
+                                className="form-input"
+                                placeholder="e.g. 401234567890"
+                                style={{ marginBottom: 12, textAlign: 'center', letterSpacing: '0.05em' }}
+                            />
+                            <button
+                                className="btn-primary"
+                                onClick={() => {
+                                    const txn = document.getElementById('txnInput').value;
+                                    if (txn.length > 5) confirmPayment(txn);
+                                    else alert('Please enter valid Transaction ID');
+                                }}
+                            >
+                                ✅ I've Paid - Confirm
+                            </button>
+                            <button
+                                style={{ width: '100%', padding: 12, border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', marginTop: 8 }}
+                                onClick={() => setUpiModal(null)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                )
+            }
+
+
+            {/* FLOATING BOTTOM ACTION BAR */ }
+            <div className="bottom-action-bar">
+                <div className="live-badge">
+                    <div className="live-dot"></div>
+                    Editing
+                </div>
+                <div className="action-divider"></div>
+                <button className="action-btn" title="Undo">↩️ Undo</button>
+                <button className="action-btn" title="Redo">↪️ Redo</button>
+                <div className="action-divider"></div>
+                <button className="action-btn" onClick={() => setMode(mode === 'desktop' ? 'mobile' : 'desktop')}>
+                    {mode === 'desktop' ? '📱' : '🖥️'} {mode === 'desktop' ? 'Mobile' : 'Desktop'}
+                </button>
+                <button className="action-btn primary" onClick={handleCheckout}>
+                    🚀 Publish — ₹{totalPrice}
+                </button>
+            </div>
+                </div >
             );
         }
 
