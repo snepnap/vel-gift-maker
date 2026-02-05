@@ -14,31 +14,62 @@
         rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #09090b;
-            --bg-secondary: rgba(15, 15, 17, 0.8);
-            --bg-tertiary: rgba(24, 24, 27, 0.9);
-            --bg-glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(244, 63, 94, 0.3);
-            --text-primary: #ffffff;
-            --text-secondary: #a1a1aa;
-            --text-muted: #52525b;
-            --accent: #f43f5e;
+            /* Modern v0.dev color system */
+            --background: 0 0% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 0 0% 3.9%;
+            --card-foreground: 0 0% 98%;
+            --popover: 0 0% 3.9%;
+            --popover-foreground: 0 0% 98%;
+            --primary: 346.8 77.2% 49.8%;
+            --primary-foreground: 355.7 100% 97.3%;
+            --secondary: 240 3.7% 15.9%;
+            --secondary-foreground: 0 0% 98%;
+            --muted: 0 0% 15%;
+            --muted-foreground: 240 5% 64.9%;
+            --accent: 12 6.5% 15.1%;
+            --accent-foreground: 0 0% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --border: 240 3.7% 15.9%;
+            --input: 240 3.7% 15.9%;
+            --ring: 346.8 77.2% 49.8%;
+            --radius: 0.75rem;
+
+            /* Legacy support */
+            --bg-primary: hsl(var(--background));
+            --bg-secondary: hsl(var(--card));
+            --bg-tertiary: hsl(var(--secondary));
+            --bg-glass: hsla(0, 0%, 100%, 0.05);
+            --border-color: hsl(var(--border));
+            --border-glow: hsla(346.8, 77.2%, 49.8%, 0.3);
+            --text-primary: hsl(var(--foreground));
+            --text-secondary: hsl(var(--muted-foreground));
+            --text-muted: hsl(240, 5%, 34.9%);
+            --accent: hsl(var(--primary));
             --accent-purple: #a855f7;
             --accent-cyan: #22d3ee;
-            --glass-blur: 20px;
+            --glass-blur: 24px;
             --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         [data-theme="light"] {
-            --bg-primary: #fafafa;
-            --bg-secondary: rgba(255, 255, 255, 0.9);
-            --bg-tertiary: rgba(245, 245, 245, 0.95);
-            --bg-glass: rgba(255, 255, 255, 0.7);
-            --border: rgba(0, 0, 0, 0.08);
-            --text-primary: #18181b;
-            --text-secondary: #52525b;
-            --text-muted: #a1a1aa;
+            --background: 0 0% 100%;
+            --foreground: 0 0% 3.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 0 0% 3.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 0 0% 3.9%;
+            --primary: 346.8 77.2% 49.8%;
+            --primary-foreground: 355.7 100% 97.3%;
+            --secondary: 240 4.8% 95.9%;
+            --secondary-foreground: 240 5.9% 10%;
+            --muted: 240 4.8% 95.9%;
+            --muted-foreground: 240 3.8% 46.1%;
+            --accent: 240 4.8% 95.9%;
+            --destructive: 0 84.2% 60.2%;
+            --border: 240 5.9% 90%;
+            --input: 240 5.9% 90%;
+            --ring: 346.8 77.2% 49.8%;
         }
 
         * {
