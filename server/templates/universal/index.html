@@ -107,6 +107,135 @@
             --font-main: 'Space Grotesk', sans-serif;
         }
 
+        /* NEW THEMES 2025 */
+        [data-style="aurora"] {
+            --primary: #22d3ee;
+            --text: #fff;
+            --bg: #0f172a;
+            --font-main: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #0c4a6e 25%, #1e293b 50%, #701a75 75%, #0f172a 100%);
+            background-size: 400% 400%;
+            animation: auroraShift 20s ease infinite;
+        }
+
+        @keyframes auroraShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        [data-style="underwater"] {
+            --primary: #06b6d4;
+            --text: #ecfeff;
+            --bg: #164e63;
+            --font-main: 'Playfair Display', serif;
+            background: radial-gradient(circle at 50% 50%, #006994, #003554);
+        }
+
+        [data-style="underwater"]::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            animation: bubbleRise 15s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes bubbleRise {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-100%);
+            }
+        }
+
+        [data-style="galaxy"] {
+            --primary: #a855f7;
+            --text: #fff;
+            --bg: #1a0033;
+            --font-main: 'Space Grotesk', sans-serif;
+            background: radial-gradient(ellipse at center, #2d0a4e, #1a0033, #000);
+        }
+
+        [data-style="galaxy"]::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, white, transparent),
+                radial-gradient(2px 2px at 60px 70px, white, transparent),
+                radial-gradient(1px 1px at 50px 50px, white, transparent),
+                radial-gradient(1px 1px at 130px 80px, white, transparent),
+                radial-gradient(2px 2px at 90px 10px, white, transparent);
+            background-size: 200px 200px;
+            background-repeat: repeat;
+            animation: twinkle 5s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        [data-style="meadow"] {
+            --primary: #84cc16;
+            --text: #f0fdf4;
+            --bg: #365314;
+            --font-main: 'Playfair Display', serif;
+            background: linear-gradient(to bottom, #7cb342 0%, #558b2f 50%, #33691e 100%);
+        }
+
+        [data-style="citynight"] {
+            --primary: #f59e0b;
+            --text: #fef3c7;
+            --bg: #0c0a09;
+            --font-main: 'Space Grotesk', sans-serif;
+            background: linear-gradient(to bottom, #1a1a2e 0%, #0f0e17 100%);
+        }
+
+        [data-style="citynight"]::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(transparent 0%, transparent 80%, #1a1a2e 100%),
+                repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255, 255, 255, 0.03) 41px, rgba(255, 255, 255, 0.03) 42px, transparent 43px);
+            animation: cityGlow 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes cityGlow {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 0.9;
+            }
+        }
+
         body {
             margin: 0;
             padding: 0;
