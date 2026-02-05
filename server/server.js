@@ -221,6 +221,46 @@ app.post('/api/admin/verify-payment', async (req, res) => {
     }
 });
 
+// API: ADMIN - Test publish (bypass payment for testing)
+app.post('/api/admin/test-publish', async (req, res) => {
+    try {
+        const { features, theme, config, adminKey } = req.body;
+
+        if (adminKey !== ADMIN_KEY) {
+            return res.status(401).json({ error: 'Unauthorized - Invalid admin key' });
+        }
+
+        const valentineId = 'TEST-' + generateId();
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+        if (process.env.MONGODB_URI) {
+            // Create valentine directly (no order/payment)
+            await Valentine.create({
+                valentineId,
+                user: req.user?._id,
+                orderId: 'ADMIN-TEST',
+                theme: theme || 'universal',
+                config: config || {},
+                features: features || []
+            });
+        }
+
+        console.log(`[ADMIN-TEST] Created test valentine: ${valentineId}`);
+
+        res.json({
+            success: true,
+            valentineId,
+            valentineUrl: `${baseUrl}/v/${valentineId}`,
+            shareUrl: `/v/${valentineId}`,
+            message: '🧪 Test valentine created!'
+        });
+    } catch (error) {
+        console.error('Admin test publish error:', error);
+        res.status(500).json({ error: 'Test publish failed: ' + error.message });
+    }
+});
+
+
 // API: ADMIN - Get pending payments
 app.get('/api/admin/pending', async (req, res) => {
     const adminKey = req.query.key || req.headers['x-admin-key'];

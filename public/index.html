@@ -1834,6 +1834,18 @@
             const [myOrders, setMyOrders] = useState([]);
             const [loadingOrders, setLoadingOrders] = useState(false);
 
+            // Admin Testing Mode (accessed via ?admin=ADMIN_KEY)
+            const [isAdminMode, setIsAdminMode] = useState(false);
+            useEffect(() => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const adminKey = urlParams.get('admin');
+                if (adminKey === 'admin123changeme') { // Matches .env ADMIN_KEY
+                    setIsAdminMode(true);
+                    console.log('🔧 Admin Testing Mode Enabled');
+                }
+            }, []);
+
+
             // Fetch Orders
             const fetchMyOrders = async () => {
                 if (!currentUser) return;
@@ -2062,10 +2074,13 @@
             const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(previewUrl)}`;
 
             useEffect(() => {
+                const themeDef = THEMES.find(t => t.id === currentTheme);
                 const send = () => iframeRef.current?.contentWindow?.postMessage({
                     type: 'UPDATE_CONFIG',
                     payload: {
                         ...config,
+                        style: themeDef?.id || currentTheme, // Theme ID becomes the style
+                        primaryColor: themeDef?.config?.primaryColor || config.primaryColor || '#e11d48',
                         features: selectedFeatures,
                         accentColor: COLORS.find(c => c.id === accentColor)?.color,
                         fontFamily: FONTS.find(f => f.id === selectedFont)?.name,
@@ -2075,7 +2090,7 @@
                 send();
                 const interval = setInterval(send, 2000);
                 return () => clearInterval(interval);
-            }, [config, selectedFeatures, accentColor, selectedFont, animationLevel]);
+            }, [config, selectedFeatures, accentColor, selectedFont, animationLevel, currentTheme]);
 
             // Keyboard shortcuts
             useEffect(() => {
@@ -2121,6 +2136,38 @@
                     alert('Order failed. Please try again.');
                 }
             };
+
+            // Admin Bypass: Simulate completed payment for testing
+            const handleAdminTestPublish = async () => {
+                if (!isAdminMode) return alert('Admin mode not enabled');
+                confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 }, colors: ['#22c55e', '#10b981', '#14b8a6'] });
+                try {
+                    const res = await fetch('/api/admin/test-publish', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            features: selectedFeatures,
+                            theme: currentTheme,
+                            config: { ...config, style: currentTheme },
+                            adminKey: 'admin123changeme'
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success && data.valentineUrl) {
+                        setOrderData({
+                            valentineUrl: data.valentineUrl,
+                            orderId: data.orderId || 'TEST-' + Date.now()
+                        });
+                        alert(`✅ Test Valentine Created!\\n\\nURL: ${data.valentineUrl}`);
+                    } else {
+                        alert('Admin publish failed: ' + (data.error || 'Unknown error'));
+                    }
+                } catch (e) {
+                    console.error('Admin Test Publish Error:', e);
+                    alert('Admin publish failed. Check console for details.');
+                }
+            };
+
 
             const confirmPayment = async (transactionId) => {
                 try {
@@ -2929,10 +2976,16 @@
                         <button className="action-btn" onClick={() => setMode(mode === 'desktop' ? 'mobile' : 'desktop')}>
                             {mode === 'desktop' ? '📱' : '🖥️'} {mode === 'desktop' ? 'Mobile' : 'Desktop'}
                         </button>
+                        {isAdminMode && (
+                            <button className="action-btn" style={{ background: 'linear-gradient(135deg, #22c55e, #10b981)', color: 'white' }} onClick={handleAdminTestPublish}>
+                                🧪 Test Publish (Admin)
+                            </button>
+                        )}
                         <button className="action-btn primary" onClick={handleCheckout}>
                             🚀 Publish — ₹{totalPrice}
                         </button>
                     </div>
+
                 </div >
             );
         }
