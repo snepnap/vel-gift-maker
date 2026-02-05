@@ -1267,16 +1267,85 @@
         const TEMPLATES = [
             {
                 id: 'romantic', icon: '💕', name: 'Classic Romance',
-                desc: 'Elegant and heartfelt with soft animations',
+                desc: 'Elegant and heartfelt',
                 config: {
                     message: "My dearest love,\n\nEvery moment with you is a treasure. You are my everything.\n\nForever yours.",
-                    theme: 'classic',
+                    theme: 'cosmic',
                     features: ['feature_gallery', 'feature_timeline', 'feature_music'],
                     timeline: [
                         { date: "When We Met", title: "Love at First Sight", description: "The moment our eyes met, I knew you were special." },
                         { date: "Our First Date", title: "Magic Happened", description: "Coffee, laughter, and endless conversation." },
                         { date: "Today", title: "Still Falling", description: "Every day I fall more in love with you." }
                     ]
+                }
+            },
+            {
+                id: 'playful', icon: '🎉', name: 'Playful & Fun',
+                desc: 'Bright and energetic',
+                config: {
+                    message: "Hey you! 😊\n\nYou make every day an adventure. Let's create more memories together!\n\nLove you tons!",
+                    theme: 'sakura',
+                    features: ['feature_gallery', 'feature_quiz', 'feature_gift'],
+                    quiz: { question: "What's my favorite thing about you?", options: ["Your smile", "Your laugh", "Your hugs", "Everything!"], correctIndex: 3 }
+                }
+            },
+            {
+                id: 'minimal', icon: '✨', name: 'Elegant Minimal',
+                desc: 'Clean and simple',
+                config: {
+                    message: "To my love,\n\nSimple words cannot express how I feel. You complete me.\n\nAlways.",
+                    theme: 'minimal',
+                    features: ['feature_gallery', 'feature_countdown']
+                }
+            },
+            {
+                id: 'poetic', icon: '📜', name: 'Poetic Soul',
+                desc: 'Literary and deep',
+                config: {
+                    message: "My Beloved,\n\nLike the stars that paint the midnight sky, your love illuminates my world. In the garden of my heart, you are the most beautiful flower.\n\nEternally yours.",
+                    theme: 'rose_garden',
+                    features: ['feature_timeline', 'feature_music', 'feature_countdown'],
+                    timeline: [
+                        { date: "Chapter 1", title: "Destiny's Meeting", description: "Two souls destined to find each other." },
+                        { date: "Chapter 2", title: "Growing Together", description: "Through every season, our love bloomed." },
+                        { date: "Chapter 3", title: "Forever After", description: "The story continues, written by us." }
+                    ]
+                }
+            },
+            {
+                id: 'cosmic', icon: '🪐', name: 'Cosmic Adventure',
+                desc: 'Dark mode with sparkles',
+                config: {
+                    message: "You are my universe,\n\nIn the vastness of space, I found you. My star, my moon, my everything.\n\nAcross galaxies, I'd find you again.",
+                    theme: 'cosmic',
+                    features: ['feature_gallery', 'feature_timeline', 'feature_quiz', 'feature_gift']
+                }
+            },
+            {
+                id: 'neon', icon: '💜', name: 'Cyberpunk Love',
+                desc: 'Futuristic neon vibes',
+                config: {
+                    message: "[LOVE.EXE INITIATED]\n\nYou've hacked my heart.\nNo firewall can stop my feelings.\n\n[STATUS: FOREVER YOURS]",
+                    theme: 'neon',
+                    features: ['feature_gallery', 'feature_quiz', 'feature_gift', 'feature_password']
+                }
+            },
+            {
+                id: 'vintage', icon: '🕯️', name: 'Vintage Letter',
+                desc: 'Old-fashioned charm',
+                config: {
+                    message: "My Dearest,\n\nIn this modern world, my love for you is timeless. Like letters of old, my feelings are penned with care.\n\nYours always.",
+                    theme: 'vintage',
+                    features: ['feature_gallery', 'feature_timeline']
+                }
+            },
+            {
+                id: 'nature', icon: '🌿', name: 'Nature Lover',
+                desc: 'Forest and greenery',
+                config: {
+                    message: "Like a forest finds its rain,\nI found you.\n\nOur love grows naturally, beautifully, endlessly.",
+                    theme: 'nature',
+                    features: ['feature_gallery', 'feature_music', 'feature_countdown']
                 }
             }
         ];
@@ -1829,7 +1898,7 @@
                                         </div>
                                         <div className="panel-subtitle">
                                             {activeSection === 'orders' && 'Your purchase history & links'}
-                                            {activeSection === 'themes' && '6 premium themes available'}
+                                            {activeSection === 'themes' && `${THEMES.length} beautiful themes`}
                                             {activeSection === 'style' && 'Colors, fonts & animations'}
                                             {activeSection === 'templates' && 'One-click setup'}
                                         </div>
