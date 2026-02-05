@@ -59,19 +59,19 @@ app.use('/api/auth', authRoutes);
 
 // PRICING
 const PRICING = {
-    base_theme: 49,
-    feature_gallery: 19,
-    feature_music: 19,
-    feature_timeline: 29,
-    feature_quiz: 19,
-    feature_gift: 29,
-    feature_countdown: 9,
-    feature_password: 9,
-    feature_scratch: 39,
-    feature_spin: 39,
-    feature_memory: 39,
-    feature_video: 49,
-    feature_confetti: 9
+    base_theme: 20,
+    feature_gallery: 9,
+    feature_music: 9,
+    feature_timeline: 15,
+    feature_quiz: 9,
+    feature_gift: 15,
+    feature_countdown: 5,
+    feature_password: 5,
+    feature_scratch: 19,
+    feature_spin: 19,
+    feature_memory: 19,
+    feature_video: 25,
+    feature_confetti: 5
 };
 
 // Helper: Generate ID

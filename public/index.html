@@ -1230,18 +1230,18 @@
         const { useState, useEffect, useRef } = React;
 
         const FEATURES = [
-            { id: 'feature_gallery', icon: '📸', label: 'Gallery', price: 19, desc: 'Photo memories' },
-            { id: 'feature_music', icon: '🎵', label: 'Music', price: 19, desc: 'Background audio' },
-            { id: 'feature_timeline', icon: '📅', label: 'Timeline', price: 29, desc: 'Your story' },
-            { id: 'feature_quiz', icon: '❓', label: 'Quiz', price: 19, desc: 'Fun questions' },
-            { id: 'feature_gift', icon: '🎁', label: 'Gift', price: 29, desc: 'Surprise reveal' },
-            { id: 'feature_countdown', icon: '⏳', label: 'Timer', price: 9, desc: 'Countdown' },
-            { id: 'feature_password', icon: '🔐', label: 'Lock', price: 9, desc: 'PIN protect' },
-            { id: 'feature_scratch', icon: '🎟️', label: 'Scratch', price: 39, desc: 'Scratch reveal' },
-            { id: 'feature_spin', icon: '🎰', label: 'Spin', price: 39, desc: 'Fortune wheel' },
-            { id: 'feature_memory', icon: '🃏', label: 'Memory', price: 39, desc: 'Card game' },
-            { id: 'feature_video', icon: '🎬', label: 'Video', price: 49, desc: 'Video message' },
-            { id: 'feature_confetti', icon: '🎊', label: 'Confetti', price: 9, desc: 'Party burst' }
+            { id: 'feature_gallery', icon: '📸', label: 'Photo Gallery', price: 9 },
+            { id: 'feature_music', icon: '🎵', label: 'Custom Music', price: 9 },
+            { id: 'feature_timeline', icon: '📅', label: 'Love Timeline', price: 15 },
+            { id: 'feature_quiz', icon: '❓', label: 'Love Quiz', price: 9 },
+            { id: 'feature_gift', icon: '🎁', label: 'Virtual Gift', price: 15 },
+            { id: 'feature_countdown', icon: '⏳', label: 'Countdown', price: 5 },
+            { id: 'feature_password', icon: '🔒', label: 'Password Lock', price: 5 },
+            { id: 'feature_scratch', icon: '✨', label: 'Scratch Card', price: 19 },
+            { id: 'feature_spin', icon: '🎡', label: 'Spin Wheel', price: 19 },
+            { id: 'feature_memory', icon: '🧠', label: 'Memory Game', price: 19 },
+            { id: 'feature_video', icon: '🎥', label: 'Video Message', price: 25 },
+            { id: 'feature_confetti', icon: '🎉', label: 'Confetti Rain', price: 5 }
         ];
 
 
@@ -1573,7 +1573,7 @@
                 return () => window.removeEventListener('keydown', handleKeyDown);
             }, []);
 
-            const themePrice = 49;
+            const themePrice = 20;
             const featurePrice = selectedFeatures.reduce((sum, fid) => (FEATURES.find(f => f.id === fid)?.price || 0) + sum, 0);
             const totalPrice = themePrice + featurePrice;
 
