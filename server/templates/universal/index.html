@@ -23,36 +23,223 @@
         }
 
         /* THEME PRESETS (Preserving existing logic) */
-        [data-style="aurora"] {
-            --primary: #22d3ee;
-            --text: #fff;
-            --bg: #0f172a;
-            background: linear-gradient(135deg, #0f172a 0%, #0c4a6e 25%, #1e293b 50%, #701a75 75%, #0f172a 100%);
-            background-size: 400% 400%;
-            animation: auroraShift 20s ease infinite;
+        /* =========================================
+           THEME ENGINE - UNIQUE IDENTITIES
+           ========================================= */
+
+        /* --- CLASSIC & ROMANTIC --- */
+        [data-style="romantic"],
+        [data-style="classic"] {
+            --primary: #e11d48;
+            --text: #1a1a1a;
+            --bg: #fffcf9;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            background-image: radial-gradient(#e11d48 0.5px, transparent 0.5px), radial-gradient(#e11d48 0.5px, #fffcf9 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        [data-style="rose_garden"] {
+            --primary: #be123c;
+            --text: #2c0b0e;
+            --bg: #ffe4e6;
+            --card-bg: rgba(255, 241, 242, 0.9);
+            border-image: linear-gradient(to right, #be123c, #fb7185) 1;
         }
 
         [data-style="luxury"] {
             --primary: #d4af37;
-            --text: #fff;
-            --bg: #000;
-            --card-bg: rgba(20, 20, 20, 0.9);
-            background: radial-gradient(circle at center, #1a1a1a, #000);
+            --text: #f8fafc;
+            --bg: #09090b;
+            --card-bg: rgba(20, 20, 20, 0.95);
+            background: #000;
+            --font-display: 'Cinzel', serif;
         }
 
-        [data-style="neon"] {
-            --primary: #a855f7;
-            --text: #fff;
-            --bg: #050505;
-            --card-bg: rgba(10, 10, 10, 0.9);
-            text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+        [data-style="luxury"] .reason-card,
+        [data-style="luxury"] .timeline-content {
+            border: 1px solid #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
         }
 
+        [data-style="minimal"] {
+            --primary: #000;
+            --text: #000;
+            --bg: #fff;
+            --card-bg: #fff;
+            --font-display: 'Inter', sans-serif;
+            --font-main: 'Inter', sans-serif;
+        }
+
+        [data-style="minimal"] .reason-card {
+            box-shadow: none;
+            border: 1px solid #000;
+            border-radius: 0;
+        }
+
+        [data-style="minimal"] .pulsing-heart {
+            fill: #000;
+            filter: none;
+        }
+
+        /* --- RETRO & VINTAGE --- */
         [data-style="pixel"] {
             --primary: #3b82f6;
             --text: #fff;
             --bg: #1a1a1a;
+            --card-bg: #000;
             image-rendering: pixelated;
+            font-family: 'Courier New', monospace;
+        }
+
+        [data-style="pixel"] .reason-card {
+            border: 4px solid var(--primary);
+            box-shadow: 8px 8px 0px var(--primary);
+            border-radius: 0;
+        }
+
+        [data-style="vintage"] {
+            --primary: #8b4513;
+            --text: #3e2723;
+            --bg: #f4e4bc;
+            background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+            --font-display: 'Playfair Display', serif;
+        }
+
+        [data-style="vintage"] .reason-card {
+            background: #e8dcc5;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+            transform: rotate(-1deg);
+        }
+
+        [data-style="polaroid"] {
+            --primary: #be123c;
+            --text: #333;
+            --bg: #e5e5e5;
+            --card-bg: #fff;
+        }
+
+        [data-style="polaroid"] .reason-card {
+            padding: 15px 15px 40px 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transform: rotate(2deg);
+            border-radius: 0;
+        }
+
+        [data-style="polaroid"] .reason-card:nth-child(even) {
+            transform: rotate(-1deg);
+        }
+
+        /* --- NATURE & ORGANIC --- */
+        [data-style="nature"] {
+            --primary: #15803d;
+            --text: #052e16;
+            --bg: #f0fdf4;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.62 50l-6.363 6.364a3 3 0 0 1-4.243 0L39.77 52.12a3 3 0 0 1 0-4.243l6.364-6.364a3 3 0 0 1 4.243 0L54.62 50zm-33.15 0l-6.363 6.364a3 3 0 0 1-4.243 0L6.626 52.12a3 3 0 0 1 0-4.243l6.364-6.364a3 3 0 0 1 4.243 0L21.47 50zM5.314 30.556l6.364-6.364a3 3 0 0 1 4.243 0l4.242 4.242a3 3 0 0 1 0 4.243l-6.364 6.364a3 3 0 0 1-4.243 0L5.314 34.8a3 3 0 0 1 0-4.243zM38.455 30.556l6.364-6.364a3 3 0 0 1 4.243 0l4.242 4.242a3 3 0 0 1 0 4.243l-6.364 6.364a3 3 0 0 1-4.243 0L38.455 34.8a3 3 0 0 1 0-4.243z' fill='%2315803d' fill-opacity='0.05' fill-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
+        }
+
+        [data-style="ocean"],
+        [data-style="underwater"] {
+            --primary: #0ea5e9;
+            --text: #0c4a6e;
+            --bg: #e0f2fe;
+            --card-bg: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(8px);
+        }
+
+        [data-style="ocean"] .reason-card {
+            border-radius: 40px 40px 40px 4px;
+            border: 2px solid #bae6fd;
+        }
+
+        [data-style="sunset"],
+        [data-style="meadow"] {
+            --primary: #f97316;
+            --text: #431407;
+            --bg: linear-gradient(to bottom, #ffedd5, #fdba74);
+            --card-bg: rgba(255, 255, 255, 0.6);
+        }
+
+        [data-style="cloud"] {
+            --primary: #6366f1;
+            --text: #312e81;
+            --bg: #eef2ff;
+            --card-bg: #fff;
+        }
+
+        [data-style="cloud"] .reason-card {
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        /* --- MODERN & APP --- */
+        [data-style="music"] {
+            --primary: #1db954;
+            --text: #fff;
+            --bg: #121212;
+            --card-bg: #282828;
+            --font-display: 'Inter', sans-serif;
+        }
+
+        [data-style="music"] .reason-card {
+            border-radius: 8px;
+        }
+
+        [data-style="stream"] {
+            --primary: #e50914;
+            --text: #fff;
+            --bg: #141414;
+            --card-bg: #1f1f1f;
+        }
+
+        [data-style="chat"],
+        [data-style="social"] {
+            --primary: #0084ff;
+            --text: #1a1a1a;
+            --bg: #f0f2f5;
+            --card-bg: #fff;
+        }
+
+        [data-style="chat"] .reason-card {
+            border-radius: 20px 20px 20px 0;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- ABSTRACT & SCI-FI --- */
+        [data-style="neon"],
+        [data-style="cyberpunk"],
+        [data-style="citynight"] {
+            --primary: #d946ef;
+            --text: #fff;
+            --bg: #050505;
+            --card-bg: rgba(20, 20, 20, 0.8);
+            text-shadow: 0 0 10px rgba(217, 70, 239, 0.5);
+            background: #000;
+        }
+
+        [data-style="neon"] .reason-card {
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 15px var(--primary), inset 0 0 10px rgba(217, 70, 239, 0.2);
+        }
+
+        [data-style="cosmic"],
+        [data-style="galaxy"] {
+            --primary: #8b5cf6;
+            --text: #fff;
+            --bg: #0f0c29;
+            background: radial-gradient(circle at center, #240b36, #0f0c29);
+        }
+
+        [data-style="aurora"] {
+            --primary: #22d3ee;
+            --text: #fff;
+            --bg: #0f172a;
+            background: linear-gradient(135deg, #0f172a, #0c4a6e, #1e293b);
+            background-size: 400% 400%;
+            animation: auroraShift 20s ease infinite;
         }
 
         [data-style="dark"] {
