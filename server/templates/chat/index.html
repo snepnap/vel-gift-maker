@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Chat History</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #0084ff;
+            --bg: #ece5dd;
+            /* WhatsApp default */
+            --header-bg: #f0f2f5;
+            --incoming-bg: #ffffff;
+            --outgoing-bg: #dcf8c6;
+            --text: #111b21;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .chat-header {
+            background: var(--header-bg);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e1e3e6;
+            z-index: 100;
+        }
+
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dfe3e6;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            position: relative;
+        }
+
+        .avatar-circle::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: #00c853;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border: 2px solid var(--header-bg);
+        }
+
+        .chat-info h3 {
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        .chat-info p {
+            font-size: 0.8rem;
+            color: #667781;
+        }
+
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 20px;
+            color: #54656f;
+        }
+
+        /* Message Area */
+        .chat-container {
+            flex: 1;
+            padding: 20px 5%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .date-divider {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .date-tag {
+            background: rgba(225, 242, 250, 0.9);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: #54656f;
+            display: inline-block;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        .msg-in {
+            align-self: flex-start;
+            background: var(--incoming-bg);
+            border-top-left-radius: 0;
+        }
+
+        .msg-in::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -8px;
+            width: 0;
+            height: 0;
+            border: 8px solid transparent;
+            border-top-color: var(--incoming-bg);
+            border-right: 0;
+            margin-top: 0;
+        }
+
+        .msg-out {
+            align-self: flex-end;
+            background: var(--outgoing-bg);
+            border-top-right-radius: 0;
+        }
+
+        .msg-out::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -8px;
+            width: 0;
+            height: 0;
+            border: 8px solid transparent;
+            border-top-color: var(--outgoing-bg);
+            border-left: 0;
+            margin-top: 0;
+        }
+
+        .msg-meta {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+            font-size: 0.7rem;
+            color: #667781;
+        }
+
+        .double-tick {
+            color: #53bdeb;
+            font-size: 0.8rem;
+        }
+
+        /* Input Area */
+        .input-area {
+            background: #f0f2f5;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-top: 1px solid #d1d7db;
+        }
+
+        .input-box {
+            flex: 1;
+            background: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: #888;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .mic-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #54656f;
+            cursor: pointer;
+        }
+
+        .highlight-text {
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 4px;
+        }
+
+        /* Finale */
+        .finale-message {
+            align-self: center;
+            background: #ffecb3;
+            padding: 15px 25px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid #ffe082;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="chat-header">
+        <div class="avatar-circle">❤️</div>
+        <div class="chat-info">
+            <h3 id="partnerNameDisplay">My Love</h3>
+            <p>online</p>
+        </div>
+        <div class="header-actions">
+            <span>📹</span>
+            <span>📞</span>
+            <span>🔍</span>
+        </div>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="date-divider"><span class="date-tag">Today</span></div>
+
+        <!-- Intro Message -->
+        <div class="message msg-out">
+            Hey! Are you there? I have something to tell you ❤️
+            <div class="msg-meta">10:00 AM <span class="double-tick">✓✓</span></div>
+        </div>
+
+        <!-- Will be populated by JS -->
+    </div>
+
+    <div class="input-area">
+        <div style="font-size: 1.5rem; color: #54656f;">😊</div>
+        <div class="input-box">
+            Type a message...
+            <span>📎</span>
+        </div>
+        <div class="mic-btn" onclick="triggerFinale()">🎤</div>
+    </div>
+
+    <script>
+        const DEFAULT_CONFIG = {
+            style: 'chat',
+            partnerName: "My Love",
+            message: "Will you be mine?",
+            reasons: [
+                { title: "Everything", body: "I love everything about you." }
+            ]
+        };
+
+        let config = window.VALENTINE_CONFIG || DEFAULT_CONFIG;
+
+        function init() {
+            document.getElementById('partnerNameDisplay').innerText = config.partnerName || "My Love";
+
+            const chatContainer = document.getElementById('chatContainer');
+            // Keep header and existing static messages if any, or clear
+            // For now, let's append reasons as messages
+
+            // Clear existing reasons (but keep intro)
+            // Implementation detail: for simplicity, we'll just clear all except first 2 children if we want, or rebuild.
+            // Let's rebuild after the date divider.
+
+            const divider = chatContainer.querySelector('.date-divider');
+            chatContainer.innerHTML = '';
+            chatContainer.appendChild(divider);
+
+            // Intro
+            const intro = document.createElement('div');
+            intro.className = 'message msg-out';
+            intro.innerHTML = `Hey! Are you there? I have something to tell you ❤️<div class="msg-meta">10:00 AM <span class="double-tick">✓✓</span></div>`;
+            chatContainer.appendChild(intro);
+
+            (config.reasons || []).forEach((r, i) => {
+                // Alternating messages
+                const isEven = i % 2 === 0;
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `message ${isEven ? 'msg-in' : 'msg-out'}`;
+
+                const time = `10:${(i + 1).toString().padStart(2, '0')} AM`;
+
+                msgDiv.innerHTML = `
+                    <div class="highlight-text">${r.title}</div>
+                    ${r.body}
+                    <div class="msg-meta">${time} <span class="double-tick">✓✓</span></div>
+                `;
+                chatContainer.appendChild(msgDiv);
+            });
+
+            // Finale Message
+            const finale = document.createElement('div');
+            finale.className = 'finale-message';
+            finale.innerHTML = `<strong>${config.message || "Will You Be My Valentine?"}</strong><br><span style="font-size:0.8rem">Click to reply YES</span>`;
+            finale.onclick = triggerFinale;
+            chatContainer.appendChild(finale);
+        }
+
+        function triggerFinale() {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            alert("💖 Reply Sent: YES! 💖");
+        }
+
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'UPDATE_CONFIG') {
+                config = { ...config, ...e.data.payload };
+                init();
+            }
+        });
+
+        init();
+    </script>
+</body>
+
+</html>

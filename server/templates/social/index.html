@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Love Feed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lobster&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #ed4956;
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --border: #dbdbdb;
+            --text: #262626;
+            --text-secondary: #8e8e8e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            padding-bottom: 60px;
+        }
+
+        /* App Header */
+        .app-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4%;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Lobster', cursive;
+            font-size: 1.8rem;
+        }
+
+        .header-icons {
+            font-size: 1.5rem;
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Stories Bar */
+        .stories-bar {
+            margin-top: 60px;
+            background: var(--surface);
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-left: 4%;
+        }
+
+        .stories-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            min-width: 70px;
+            cursor: pointer;
+        }
+
+        .story-ring {
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            padding: 2px;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+
+        .story-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid white;
+            background: #eee;
+            background-size: cover;
+        }
+
+        .story-name {
+            font-size: 0.75rem;
+            width: 70px;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        /* Feed */
+        .feed-container {
+            max-width: 470px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .post-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+        }
+
+        .post-header {
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #eee;
+        }
+
+        .more-dots {
+            color: var(--text-secondary);
+        }
+
+        .post-content {
+            width: 100%;
+            background: #efefef;
+            aspect-ratio: 1/1;
+            /* Square posts */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #ccc;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .post-actions {
+            padding: 10px 14px;
+            font-size: 1.5rem;
+            display: flex;
+            gap: 16px;
+            color: var(--text);
+        }
+
+        .action-right {
+            margin-left: auto;
+        }
+
+        .post-likes {
+            padding: 0 14px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .post-caption {
+            padding: 0 14px 14px 14px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .account-name {
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .post-time {
+            padding: 0 14px 14px 14px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 50px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 1.5rem;
+            z-index: 100;
+        }
+
+        /* Mobile specific adjustments included by default layout */
+    </style>
+</head>
+
+<body>
+
+    <header class="app-header">
+        <div class="logo">Lovestagram</div>
+        <div class="header-icons">
+            <span>❤️</span>
+            <span>💬</span>
+        </div>
+    </header>
+
+    <div class="stories-bar" id="storiesBar">
+        <div class="story-item">
+            <div class="story-ring">
+                <div class="story-img"
+                    style="background-image: url('https://ui-avatars.com/api/?name=Us&background=random')"></div>
+            </div>
+            <span class="story-name">Our Story</span>
+        </div>
+        <div class="story-item">
+            <div class="story-ring">
+                <div class="story-img"
+                    style="background-image: url('https://ui-avatars.com/api/?name=Memories&background=random')"></div>
+            </div>
+            <span class="story-name">Memories</span>
+        </div>
+        <!-- More stories via JS -->
+    </div>
+
+    <div class="feed-container" id="feedContainer">
+        <!-- JS Populated Posts -->
+    </div>
+
+    <nav class="bottom-nav">
+        <span>🏠</span>
+        <span>🔍</span>
+        <span>➕</span>
+        <span>🎥</span>
+        <span onclick="triggerFinale()" style="cursor: pointer;">💖</span>
+    </nav>
+
+    <script>
+        const DEFAULT_CONFIG = {
+            style: 'social',
+            partnerName: "my_love_official",
+            tagline: "Follow our journey...",
+            reasons: [
+                { title: "Best Friends", body: "You are my best friend and my lover." },
+                { title: "Adventure", body: "Every day with you is a new adventure." }
+            ]
+        };
+
+        let config = window.VALENTINE_CONFIG || DEFAULT_CONFIG;
+
+        function init() {
+            // Update partner name in header or tagline?
+            // Actually partnerName is usually the account handle here.
+
+            const feedContainer = document.getElementById('feedContainer');
+            feedContainer.innerHTML = '';
+
+            // Generate posts from reasons
+            (config.reasons || []).forEach((r, i) => {
+                const article = document.createElement('article');
+                article.className = 'post-card';
+
+                // Placeholder image from Unsplash
+                const imgId = i % 2 === 0 ? '1518199266791-5375a83190b7' : '1516589178581-6cd7833ae3b2';
+
+                article.innerHTML = `
+                    <div class="post-header">
+                        <div class="user-info">
+                            <div class="user-avatar" style="background-image: url('https://ui-avatars.com/api/?name=${config.partnerName}&background=random')"></div>
+                            <span>${config.partnerName.replace(/\s+/g, '_').toLowerCase()}</span>
+                        </div>
+                        <span class="more-dots">•••</span>
+                    </div>
+                    
+                    <div class="post-content" style="background-image: url('https://images.unsplash.com/photo-${imgId}?auto=format&fit=crop&w=600&q=80')"></div>
+                    
+                    <div class="post-actions">
+                        <span style="color:red">❤️</span>
+                        <span>💬</span>
+                        <span>🚀</span>
+                        <div class="action-right">🔖</div>
+                    </div>
+                    
+                    <div class="post-likes">${100 + i * 53} likes</div>
+                    
+                    <div class="post-caption">
+                        <span class="account-name">${config.partnerName.replace(/\s+/g, '_').toLowerCase()}</span>
+                        ${r.title} - ${r.body}
+                    </div>
+                    
+                    <div class="post-time">${i + 1} DAYS AGO</div>
+                `;
+                feedContainer.appendChild(article);
+            });
+
+            // Finale Post
+            const finale = document.createElement('article');
+            finale.className = 'post-card';
+            finale.innerHTML = `
+                <div class="post-header">
+                    <div class="user-info">
+                        <div class="user-avatar"></div>
+                        <span>admin_love</span>
+                    </div>
+                </div>
+                <div class="post-content" style="background: #ed4956; color: white; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+                    <h2 style="font-family: 'Lobster'">Will You Be Mine?</h2>
+                    <button onclick="triggerFinale()" style="margin-top:20px; padding:10px 20px; border:none; background:white; color:#ed4956; font-weight:bold; border-radius:4px; cursor:pointer;">YES!</button>
+                </div>
+            `;
+            feedContainer.appendChild(finale);
+        }
+
+        function triggerFinale() {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            alert("💖 You are verified! 💖");
+        }
+
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'UPDATE_CONFIG') {
+                config = { ...config, ...e.data.payload };
+                init();
+            }
+        });
+
+        init();
+    </script>
+</body>
+
+</html>
