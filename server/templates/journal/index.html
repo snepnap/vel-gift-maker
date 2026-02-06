@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Scrapbook</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Permanent+Marker&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -15,6 +15,7 @@
             --ink: #2c3e50;
             --accent: #c0392b;
             --tape: rgba(255, 255, 255, 0.5);
+            --font-hand: 'Indie Flower', cursive;
         }
 
         * {
@@ -27,8 +28,51 @@
             background-color: #e0d4c1;
             background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
             color: var(--ink);
-            font-family: 'Indie Flower', cursive;
+            font-family: var(--font-hand);
             padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        /* THEME: POLAROID OVERRIDES */
+        body[data-style="polaroid"] {
+            background-color: #5a4a42;
+            /* Corkboard color */
+            background-image: url("https://www.transparenttextures.com/patterns/cork-board.png");
+            --paper-bg: transparent;
+            --font-hand: 'Permanent Marker', cursive;
+            padding: 20px;
+        }
+
+        body[data-style="polaroid"] .book-container {
+            background: transparent;
+            box-shadow: none;
+            border: none;
+            padding: 0;
+            max-width: 1200px;
+        }
+
+        body[data-style="polaroid"] .book-container::before {
+            display: none;
+        }
+
+        body[data-style="polaroid"] h1 {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            border: none;
+            font-family: 'Permanent Marker', cursive;
+        }
+
+        body[data-style="polaroid"] .tagline {
+            color: #eee;
+        }
+
+        /* THEME: ROSE/SAKURA OVERRIDES */
+        body[data-style="rose_garden"],
+        body[data-style="sakura"] {
+            background-color: #ffe4e6;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0c5.523 0 10 4.477 10 10s-4.477 10-10 10S0 15.523 0 10 4.477 0 10 0zm0 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16z' fill='%23fb7185' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            --ink: #881337;
+            --accent: #e11d48;
         }
 
         .book-container {
@@ -41,6 +85,7 @@
             min-height: 90vh;
             border-left: 20px solid #dcdcdc;
             /* spine */
+            transition: all 0.3s;
         }
 
         .book-container::before {
@@ -97,16 +142,34 @@
             z-index: 10;
         }
 
-        .scrap-item::before {
+        /* Tape Effect for Polaroid */
+        body[data-style="polaroid"] .scrap-item::after {
             content: '';
-            width: 100px;
-            height: 30px;
-            background: rgba(255, 255, 200, 0.4);
+            width: 80px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.3);
             position: absolute;
             top: -10px;
             left: 50%;
+            transform: translateX(-50%) rotate(2deg);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* Pin for Vintage */
+        body[data-style="vintage"] .scrap-item::before {
+            content: '';
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #333;
+            position: absolute;
+            top: 10px;
+            left: 50%;
             transform: translateX(-50%);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            z-index: 5;
+            box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .photo-placeholder {
@@ -117,6 +180,15 @@
             background-size: cover;
             background-position: center;
             filter: sepia(0.3);
+        }
+
+        body[data-style="polaroid"] .photo-placeholder {
+            filter: none;
+            border: 1px solid #eee;
+        }
+
+        body[data-style="rose_garden"] .photo-placeholder {
+            filter: contrast(1.1) brightness(1.1);
         }
 
         h3 {
@@ -179,7 +251,7 @@
             <!-- JS Populated -->
         </div>
 
-        <div class="stamp">APPROVED</div>
+        <div class="stamp">Top Secret</div>
 
         <button class="love-btn" onclick="triggerFinale()">Be Mine?</button>
     </div>
@@ -190,14 +262,22 @@
             partnerName: "My Love",
             tagline: "Every page is you...",
             reasons: [
-                { title: "First Glance", body: "I knew instantly." },
-                { title: "Lazy Sundays", body: "Coffee and cuddles." }
+                { title: "First Glance", body: "I knew instantly." }
             ]
         };
 
         let config = window.VALENTINE_CONFIG || DEFAULT_CONFIG;
 
         function init() {
+            // Apply theme style to body for specific CSS overrides
+            document.body.setAttribute('data-style', config.style);
+
+            // Adjust stamp text based on theme
+            const stamp = document.querySelector('.stamp');
+            if (config.style === 'polaroid') stamp.innerText = "MEMORIES";
+            if (config.style === 'rose_garden') stamp.innerText = "FOREVER";
+            if (config.style === 'vintage') stamp.innerText = "ARCHIVED";
+
             document.getElementById('partnerNameDisplay').innerText = config.partnerName || "Our Story";
             document.getElementById('taglineDisplay').innerText = config.tagline || "Written with love...";
 
@@ -217,12 +297,20 @@
         }
 
         function triggerFinale() {
+            let colors = ['#c0392b', '#ffffff'];
+            let shapes = ['circle'];
+
+            if (config.style === 'rose_garden' || config.style === 'sakura') {
+                colors = ['#ffccd5', '#ffb7b2', '#ff9aa2'];
+                // Confetti doesn't support 'petal' shape natively easily, stick to circles/ovals
+            }
+
             confetti({
                 particleCount: 150,
                 spread: 70,
                 origin: { y: 0.6 },
-                colors: ['#c0392b', '#ffffff'],
-                shapes: ['circle']
+                colors: colors,
+                shapes: shapes
             });
             alert("💖 Signed, Sealed, Delivered! 💖");
         }
