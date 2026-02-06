@@ -126,18 +126,39 @@
         }
 
 
-        /* Sidebar */
+        /* Sidebar - Floating Dock Style */
         .sidebar {
-            background: rgba(9, 9, 11, 0.95);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: auto;
+            max-height: 90vh;
+            background: rgba(9, 9, 11, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 0;
-            gap: 8px;
-            z-index: 10;
+            padding: 20px 10px;
+            gap: 12px;
+            z-index: 50;
+            box-shadow:
+                0 0 0 1px rgba(0, 0, 0, 0.2),
+                0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .app-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            /* Sidebar is now fixed/floating */
+            height: 100vh;
+        }
+
+        .app-layout.panel-closed {
+            grid-template-columns: 1fr 0px;
         }
 
         .sidebar-logo {
@@ -1609,6 +1630,189 @@
         .theme-card.active::after {
             opacity: 1;
         }
+
+        /* PREMIUM UI OVERRIDES */
+
+        /* 1. Floating Dock Sidebar */
+        .dock-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 80px;
+            background: rgba(9, 9, 11, 0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0;
+            gap: 16px;
+            z-index: 50;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dock-item {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .dock-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .dock-item.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+        }
+
+        .dock-divider {
+            width: 30px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 4px 0;
+        }
+
+        /* 2. Titanium iPhone Frame */
+        .titanium-frame {
+            width: 380px;
+            height: 780px;
+            background: #121212;
+            border-radius: 56px;
+            position: relative;
+            box-shadow:
+                0 0 0 2px #3e3e42,
+                0 0 0 5px #27272a,
+                0 0 0 6px rgba(255, 255, 255, 0.05),
+                0 30px 60px rgba(0, 0, 0, 0.6);
+            transition: all 0.5s;
+        }
+
+        .titanium-frame.landscape {
+            width: 800px;
+            height: 380px;
+        }
+
+        .titanium-screen {
+            position: absolute;
+            inset: 12px;
+            background: #000;
+            border-radius: 46px;
+            overflow: hidden;
+            mask-image: radial-gradient(white, black);
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+        }
+
+        .titanium-notch {
+            position: absolute;
+            top: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 36px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 50;
+        }
+
+        /* 3. Horizontal Theme Carousel */
+        .theme-carousel {
+            display: flex;
+            gap: 24px;
+            overflow-x: auto;
+            padding: 10px 10px 40px 10px;
+            scroll-behavior: smooth;
+        }
+
+        .theme-carousel::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .theme-carousel::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .carousel-card {
+            min-width: 300px;
+            height: 450px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s;
+        }
+
+        .carousel-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent);
+        }
+
+        .carousel-card.active {
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.2);
+            transform: scale(1.02);
+        }
+
+        .carousel-preview-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.6s;
+        }
+
+        .carousel-card:hover .carousel-preview-bg {
+            transform: scale(1.1);
+        }
+
+        .carousel-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.95));
+            color: white;
+        }
+
+        /* 4. New App Layout */
+        .layout-premium {
+            display: grid;
+            grid-template-columns: 100px 1fr 420px;
+            /* Wider sidebar area for dock */
+            height: 100vh;
+            background: #000;
+        }
+
+        .layout-premium.panel-closed {
+            grid-template-columns: 100px 1fr 0px;
+        }
+
+        .layout-premium.panel-closed .right-panel {
+            width: 0;
+            opacity: 0;
+            pointer-events: none;
+            overflow: hidden;
+            padding: 0;
+            border: none;
+        }
     </style>
 </head>
 
@@ -2278,7 +2482,7 @@
 
 
             return (
-                <div className={`app-layout ${!activeSection ? 'panel-closed' : ''}`} data-theme={darkMode ? 'dark' : 'light'}>
+                <div className={`layout-premium ${!activeSection ? 'panel-closed' : ''}`} data-theme={darkMode ? 'dark' : 'light'}>
                     {/* Gradient Mesh Background */}
                     <div className="gradient-mesh"></div>
 
@@ -2287,72 +2491,58 @@
                         <div className="progress-fill" style={{ width: `${calculateProgress()}%` }}></div>
                     </div>
 
-                    {/* SIDEBAR */}
-                    <div className="sidebar">
-                        <div className="sidebar-logo">💘</div>
+                    {/* SIDEBAR - FLOATING DOCK */}
+                    <div className="dock-sidebar">
+                        <div className="sidebar-logo" style={{ fontSize: 24, marginBottom: 10 }}>💘</div>
 
-                        {/* User Account Button */}
+                        {/* User Account */}
                         {currentUser ? (
-                            <div
-                                className="sidebar-item"
-                                data-tooltip={currentUser.name}
-                                onClick={() => {
-                                    if (confirm(`Logged in as ${currentUser.email}\n\nLogout?`)) {
-                                        handleLogout();
-                                    }
-                                }}
-                                style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-purple))', color: 'white' }}
-                            >
+                            <div className="dock-item" data-tooltip={currentUser.name} onClick={() => { if (confirm(`Logged in as ${currentUser.email}\n\nLogout?`)) handleLogout(); }} style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-purple))', color: 'white' }}>
                                 {currentUser.name.charAt(0).toUpperCase()}
                             </div>
                         ) : (
-                            <div
-                                className="sidebar-item"
-                                data-tooltip="Login / Sign Up"
-                                onClick={() => setAuthModal('login')}
-                            >
-                                👤
+                            <div className="dock-item" data-tooltip="Login" onClick={() => setAuthModal('login')}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                             </div>
                         )}
 
-                        <div className="sidebar-divider"></div>
-                        <div className={`sidebar-item ${activeSection === 'orders' ? 'active' : ''}`} data-tooltip="My Gifts" onClick={() => setActiveSection('orders')}>🎁</div>
-                        <div className={`sidebar-item ${activeSection === 'themes' ? 'active' : ''}`} data-tooltip="Themes" onClick={() => setActiveSection('themes')}>🎨</div>
-                        <div className={`sidebar-item ${activeSection === 'content' ? 'active' : ''}`} data-tooltip="Content" onClick={() => setActiveSection('content')}>✍️</div>
-                        <div className={`sidebar-item ${activeSection === 'features' ? 'active' : ''}`} data-tooltip="Features" onClick={() => setActiveSection('features')}>✨</div>
-                        <div className={`sidebar-item ${activeSection === 'gallery' ? 'active' : ''}`} data-tooltip="Gallery" onClick={() => setActiveSection('gallery')}>📸</div>
-                        <div className={`sidebar-item ${activeSection === 'timeline' ? 'active' : ''}`} data-tooltip="Timeline" onClick={() => setActiveSection('timeline')}>📅</div>
-                        <div className="sidebar-divider"></div>
-                        <div className={`sidebar-item ${activeSection === 'style' ? 'active' : ''}`} data-tooltip="Style" onClick={() => setActiveSection('style')}>🎭</div>
-                        <div className={`sidebar-item ${activeSection === 'templates' ? 'active' : ''}`} data-tooltip="Templates" onClick={() => setActiveSection('templates')}>📋</div>
-                        <div className={`sidebar-item ${activeSection === 'settings' ? 'active' : ''}`} data-tooltip="Settings" onClick={() => setActiveSection('settings')}>⚙️</div>
+                        <div className="dock-divider"></div>
 
-
-                        {/* WEEK MODE SELECTOR (New) */}
-                        <div className="week-mode-bar">
-                            {VALENTINE_WEEK.map(day => (
-                                <div
-                                    key={day.id}
-                                    className={`week-day ${weekMode === day.id ? 'active' : ''}`}
-                                    onClick={() => {
-                                        setWeekMode(day.id);
-                                        if (day.theme && day.id !== 'all') setCurrentTheme(day.theme);
-                                        // Set default message for the day
-                                        if (day.id !== 'all') {
-                                            const name = config.partnerName || 'Love';
-                                            setConfig(prev => ({ ...prev, message: `Happy ${day.label.split('(')[0].trim()} ${name}! ❤️` }));
-                                        }
-                                    }}
-                                    title={day.label}
-                                >
-                                    <span style={{ fontSize: 16 }}>{day.icon}</span>
-                                    <span className="label">{day.label.split(' ')[0]}</span>
-                                </div>
-                            ))}
+                        <div className={`dock-item ${activeSection === 'themes' ? 'active' : ''}`} data-tooltip="Themes" onClick={() => setActiveSection('themes')}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5" /><circle cx="17.5" cy="10.5" r=".5" /><circle cx="8.5" cy="7.5" r=".5" /><circle cx="6.5" cy="12.5" r=".5" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></svg>
                         </div>
-                        <div className="sidebar-spacer"></div>
-                        <div className="sidebar-item" data-tooltip={darkMode ? 'Light Mode' : 'Dark Mode'} onClick={() => setDarkMode(!darkMode)}>{darkMode ? '🌙' : '☀️'}</div>
-                        <div className="sidebar-item" data-tooltip="Shortcuts" onClick={() => alert('⌘P: Preview Mode\n⌘S: Publish')}>⌨️</div>
+
+                        <div className={`dock-item ${activeSection === 'content' ? 'active' : ''}`} data-tooltip="Edit Content" onClick={() => setActiveSection('content')}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
+                        </div>
+
+                        <div className={`dock-item ${activeSection === 'features' ? 'active' : ''}`} data-tooltip="Features" onClick={() => setActiveSection('features')}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z" /></svg>
+                        </div>
+
+                        <div className={`dock-item ${activeSection === 'gallery' ? 'active' : ''}`} data-tooltip="Gallery" onClick={() => setActiveSection('gallery')}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></svg>
+                        </div>
+
+                        <div className={`dock-item ${activeSection === 'style' ? 'active' : ''}`} data-tooltip="Style" onClick={() => setActiveSection('style')}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 2v20C8.466 22 5.6 19.134 5.6 15.6c0-1.766 1.434-3.2 3.2-3.2.332 0 .66.032.978.096A4.39 4.39 0 0 1 12 11V2z" /></svg>
+                        </div>
+
+                        <div className="dock-divider"></div>
+
+                        <div className={`dock-item ${activeSection === 'orders' ? 'active' : ''}`} data-tooltip="Orders" onClick={() => setActiveSection('orders')}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13" /><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" /><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5" /></svg>
+                        </div>
+
+                        <div style={{ flex: 1 }}></div>
+
+                        <div className="dock-item" onClick={() => setDarkMode(!darkMode)}>
+                            {darkMode ? (
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><path d="M12 1v2" /><path d="M12 21v2" /><path d="M4.22 4.22l1.42 1.42" /><path d="M18.36 18.36l1.42 1.42" /><path d="M1 12h2" /><path d="M21 12h2" /><path d="M4.22 19.78l1.42-1.42" /><path d="M18.36 5.64l1.42-1.42" /></svg>
+                            ) : (
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
+                            )}
+                        </div>
                     </div>
 
 
@@ -2387,9 +2577,9 @@
                                     <iframe ref={iframeRef} src={previewUrl} style={{ width: '100%', height: '100%', border: 'none' }} onLoad={() => setTimeout(() => setLoading(false), 500)}></iframe>
                                 </div>
                             ) : (
-                                <div className={`preview-mobile ${orientation === 'landscape' ? 'landscape' : ''}`}>
-                                    <div className="preview-screen">
-                                        {orientation === 'portrait' && <div className="notch"></div>}
+                                <div className={`titanium-frame ${orientation === 'landscape' ? 'landscape' : ''}`}>
+                                    <div className="titanium-screen">
+                                        {orientation === 'portrait' && <div className="titanium-notch"></div>}
                                         {loading && <div style={{ position: 'absolute', inset: 0, background: '#09090b', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}><span className="loader"></span></div>}
                                         <iframe ref={iframeRef} src={previewUrl} style={{ width: '100%', height: '100%', border: 'none' }} onLoad={() => setTimeout(() => setLoading(false), 500)}></iframe>
                                     </div>
@@ -2493,14 +2683,14 @@
 
                                     {/* THEMES SECTION */}
                                     {activeSection === 'themes' && (
-                                        <div className="theme-grid">
+                                        <div className="theme-carousel">
                                             {THEMES.filter(t => weekMode === 'all' || t.tags?.includes(weekMode) || t.id === VALENTINE_WEEK.find(d => d.id === weekMode)?.theme).map(theme => (
-                                                <div key={theme.id} className={`theme-card ${currentTheme === theme.id ? 'active' : ''}`} onClick={() => setCurrentTheme(theme.id)}>
-                                                    <div className="theme-card-bg" style={{ background: theme.bg }}></div>
-                                                    <div className="theme-card-info">
-                                                        <span className="theme-card-name">{theme.icon} {theme.name}</span>
+                                                <div key={theme.id} className={`carousel-card ${currentTheme === theme.id ? 'active' : ''}`} onClick={() => setCurrentTheme(theme.id)}>
+                                                    <div className="carousel-preview-bg" style={{ background: theme.bg }}></div>
+                                                    <div className="carousel-info">
+                                                        <div className="carousel-title">{theme.name}</div>
+                                                        <div style={{ fontSize: 12, opacity: 0.8 }}>{theme.icon} Premium Theme</div>
                                                     </div>
-                                                    {currentTheme === theme.id && <div className="theme-card-badge">Active</div>}
                                                 </div>
                                             ))}
                                         </div>
