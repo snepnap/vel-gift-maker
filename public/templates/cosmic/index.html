@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Love</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo+2:wght@300;600&family=Rajdhani:wght@500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --bg: #0f0c29;
+            --text: #fff;
+            --card-glass: rgba(255, 255, 255, 0.05);
+            --font-main: 'Exo 2', sans-serif;
+            --font-head: 'Orbitron', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #240b36, #0f0c29);
+            color: var(--text);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* THEME: NEON / CYBERPUNK */
+        body[data-style="neon"] {
+            background: #050505;
+            --primary: #00ff9d;
+            --font-head: 'Rajdhani', sans-serif;
+        }
+
+        body[data-style="neon"] .stars {
+            display: none;
+        }
+
+        /* Cyber Grid */
+        .cyber-grid {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50vh;
+            background:
+                linear-gradient(transparent 50%, rgba(0, 255, 157, 0.2) 50%),
+                linear-gradient(90deg, rgba(0, 255, 157, 0.1) 50%, transparent 50%);
+            background-size: 50px 50px;
+            transform: perspective(500px) rotateX(60deg);
+            z-index: 0;
+            animation: gridMove 2s linear infinite;
+        }
+
+        body[data-style="neon"] .cyber-grid {
+            display: block;
+        }
+
+        @keyframes gridMove {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 0 50px;
+            }
+        }
+
+        /* THEME: UNDERWATER */
+        body[data-style="underwater"] {
+            background: linear-gradient(#006994, #001e36);
+            --primary: #aaf0d1;
+        }
+
+        body[data-style="underwater"] .stars {
+            display: none;
+        }
+
+        body[data-style="underwater"] .planet-icon {
+            filter: hue-rotate(180deg);
+        }
+
+        /* THEME: CITYNIGHT */
+        body[data-style="citynight"] {
+            background: linear-gradient(#0f2027, #203a43, #2c5364);
+            --primary: #f59e0b;
+        }
+
+        /* Starfield Animation (Default) */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: floatUp 8s linear infinite;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(0.8);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 80px 20px;
+        }
+
+        h1 {
+            font-family: var(--font-head);
+            font-size: 4rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        body[data-style="neon"] h1 {
+            text-shadow: 2px 2px #ff00de, -2px -2px #00ff9d;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            letter-spacing: 2px;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        /* Glass Cards */
+        .universe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .planet-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            transition: all 0.4s;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .planet-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .planet-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .planet-card h3 {
+            font-family: var(--font-head);
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        /* Black Hole Button */
+        .event-horizon-btn {
+            margin-top: 80px;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: white;
+            padding: 20px 50px;
+            font-family: var(--font-head);
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--primary), inset 0 0 20px var(--primary);
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .event-horizon-btn:hover {
+            background: var(--primary);
+            box-shadow: 0 0 50px var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cyber-grid"></div>
+    <div class="stars" id="starContainer"></div>
+
+    <div class="content-layer">
+        <h1 id="partnerNameDisplay">COSMIC LOVE</h1>
+        <p class="subtitle" id="taglineDisplay">OUR LOVE IS INFINITE</p>
+
+        <div class="universe-grid" id="reasonsGrid">
+            <!-- JS Populated -->
+        </div>
+
+        <button class="event-horizon-btn" onclick="triggerFinale()">ENTER ORBIT (YES)</button>
+    </div>
+
+    <script>
+        const DEFAULT_CONFIG = {
+            style: 'cosmic',
+            partnerName: "My Universe",
+            tagline: "Together until the end of time...",
+            reasons: [
+                { title: "Gravity", body: "You pull me in." }
+            ]
+        };
+
+        let config = window.VALENTINE_CONFIG || DEFAULT_CONFIG;
+
+        function createParticles() {
+            const container = document.getElementById('starContainer');
+            container.innerHTML = ''; // Clear existing
+
+            if (config.style === 'underwater') {
+                // Creates bubbles
+                for (let i = 0; i < 30; i++) {
+                    const b = document.createElement('div');
+                    b.className = 'bubble';
+                    b.style.left = Math.random() * 100 + '%';
+                    b.style.width = (Math.random() * 20 + 5) + 'px';
+                    b.style.height = b.style.width;
+                    b.style.animationDelay = Math.random() * 5 + 's';
+                    container.appendChild(b);
+                }
+            } else if (config.style === 'neon') {
+                // No stars, grid handled by different div
+                return;
+            } else {
+                // Default Stars
+                for (let i = 0; i < 100; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    star.style.width = Math.random() * 3 + 'px';
+                    star.style.height = star.style.width;
+                    star.style.animationDelay = Math.random() * 2 + 's';
+                    container.appendChild(star);
+                }
+            }
+        }
+
+        function init() {
+            document.body.setAttribute('data-style', config.style);
+
+            document.getElementById('partnerNameDisplay').innerText = config.partnerName || "COSMIC LOVE";
+            document.getElementById('taglineDisplay').innerText = (config.tagline || "INFINITE").toUpperCase();
+
+            const grid = document.getElementById('reasonsGrid');
+            grid.innerHTML = '';
+
+            let icon = '🪐';
+            if (config.style === 'underwater') icon = '🐠';
+            if (config.style === 'neon') icon = '💿';
+            if (config.style === 'citynight') icon = '🏙️';
+
+            (config.reasons || []).forEach((r, i) => {
+                const div = document.createElement('div');
+                div.className = 'planet-card';
+                div.innerHTML = `
+                    <span class="planet-icon">${icon}</span>
+                    <h3>${r.title}</h3>
+                    <p>${r.body}</p>
+                `;
+                grid.appendChild(div);
+            });
+
+            createParticles();
+        }
+
+        function triggerFinale() {
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: config.style === 'neon' ? ['#00ff9d', '#ff00de'] : ['#8b5cf6', '#ffffff']
+            });
+            alert("🚀 MISSION SUCCESS! 🚀");
+        }
+
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'UPDATE_CONFIG') {
+                config = { ...config, ...e.data.payload };
+                init();
+            }
+        });
+
+        init();
+    </script>
+</body>
+
+</html>

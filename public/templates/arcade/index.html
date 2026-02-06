@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 1: Love</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #33ff00;
+            --bg: #000;
+            --text: #33ff00;
+            --scanline: rgba(18, 16, 16, 0.5);
+            --font-main: 'Press Start 2P', cursive;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            text-shadow: 2px 2px #003300;
+            min-height: 100vh;
+        }
+
+        /* THEME: RETRO (VAPORWAVE) */
+        body[data-style="pixel"] {
+            /* Default Green */
+        }
+
+        body[data-style="retro"] {
+            --primary: #ff00ff;
+            --text: #00ffff;
+            background: linear-gradient(to bottom, #2b002b, #000044);
+            text-shadow: 2px 2px #ff00ff;
+        }
+
+        /* CRT Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+            border: 4px solid var(--text);
+            margin-top: 50px;
+            box-shadow: 0 0 20px var(--text), inset 0 0 20px var(--text);
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: #fff;
+            text-shadow: 4px 4px #ff00ff;
+        }
+
+        body[data-style="retro"] h1 {
+            text-shadow: 4px 4px #000;
+            background: -webkit-linear-gradient(#eee, #333);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .pixel-heart {
+            font-size: 5rem;
+            margin: 30px 0;
+            animation: pulse 1s infinite steps(2);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Reasons Grid */
+        .reasons-list {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: left;
+        }
+
+        .reason-item {
+            border: 2px dashed var(--text);
+            padding: 15px;
+            background: #111;
+        }
+
+        body[data-style="retro"] .reason-item {
+            background: rgba(255, 0, 255, 0.1);
+            border-style: solid;
+            box-shadow: 5px 5px 0px rgba(0, 255, 255, 0.5);
+        }
+
+        .reason-item:hover {
+            background: #222;
+        }
+
+        .level-header {
+            background: var(--text);
+            color: #000;
+            padding: 5px 10px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        body[data-style="retro"] .level-header {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Buttons */
+        .btn {
+            background: transparent;
+            color: #ff00ff;
+            font-family: var(--font-main);
+            font-size: 1.2rem;
+            padding: 20px;
+            border: 4px solid #ff00ff;
+            cursor: pointer;
+            margin-top: 40px;
+            text-shadow: 2px 2px #330033;
+            box-shadow: 5px 5px 0px #ff00ff;
+        }
+
+        body[data-style="retro"] .btn {
+            color: white;
+            border-color: white;
+            background: linear-gradient(45deg, #ff00cc, #333399);
+            box-shadow: 5px 5px 0px #00ffff;
+        }
+
+        .btn:active {
+            transform: translate(5px, 5px);
+            box-shadow: none;
+        }
+
+        .score-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--text);
+            padding-bottom: 10px;
+        }
+
+        /* Sun for Retro */
+        .retro-sun {
+            display: none;
+            position: fixed;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(to top, #ff00ff, #ffbd00);
+            border-radius: 50%;
+            z-index: 0;
+            mask-image: linear-gradient(to bottom, black 50%, transparent 50%);
+            mask-size: 100% 20px;
+            mask-repeat: repeat-y;
+        }
+
+        body[data-style="retro"] .retro-sun {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scanlines"></div>
+    <div class="retro-sun"></div>
+
+    <div class="container">
+        <div class="score-bar">
+            <span>1UP <span id="score">000000</span></span>
+            <span>HIGH SCORE <span id="highScore">999999</span></span>
+        </div>
+
+        <div class="pixel-heart">❤️</div>
+
+        <h1 id="partnerNameDisplay">PLAYER 2</h1>
+        <p id="taglineDisplay">PRESS START TO CONTINUE</p>
+
+        <div class="reasons-list" id="reasonsGrid">
+            <!-- Populated via JS -->
+        </div>
+
+        <button class="btn" onclick="triggerFinale()">INSERT COIN (YES)</button>
+    </div>
+
+    <script>
+        const DEFAULT_CONFIG = {
+            style: 'pixel',
+            partnerName: "PLAYER 2",
+            tagline: "READY PLAYER ONE?",
+            reasons: [
+                { title: "Skill", body: "Level 99 Charisma" },
+                { title: "Inventory", body: "Infinite Love Potions" }
+            ]
+        };
+
+        let config = window.VALENTINE_CONFIG || DEFAULT_CONFIG;
+
+        function init() {
+            document.body.setAttribute('data-style', config.style);
+
+            document.getElementById('partnerNameDisplay').innerText = (config.partnerName || "PLAYER 2").toUpperCase();
+            document.getElementById('taglineDisplay').innerText = (config.tagline || "INSERT COIN").toUpperCase();
+
+            const grid = document.getElementById('reasonsGrid');
+            grid.innerHTML = '';
+
+            (config.reasons || []).forEach((r, i) => {
+                const div = document.createElement('div');
+                div.className = 'reason-item';
+                div.innerHTML = `
+                    <div class="level-header">LEVEL ${i + 1}</div>
+                    <div style="line-height:1.6">${r.title.toUpperCase()}<br>
+                    <span style="font-size:0.7rem; opacity:0.8">> ${r.body}</span></div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function triggerFinale() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                shapes: ['square'],
+                colors: config.style === 'retro' ? ['#00ffff', '#ff00ff'] : ['#33ff00', '#ff00ff']
+            });
+            alert("BONUS LEVEL UNLOCKED: FOREVER!");
+        }
+
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'UPDATE_CONFIG') {
+                config = { ...config, ...e.data.payload };
+                init();
+            }
+        });
+
+        init();
+    </script>
+</body>
+
+</html>

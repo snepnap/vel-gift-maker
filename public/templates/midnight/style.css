@@ -1,0 +1,241 @@
+/* Midnight Love Theme */
+:root {
+    --bg: #1e1b4b;
+    --text: #e0e7ff;
+    --accent: #818cf8;
+    --dim: #6366f1;
+    --font: 'Outfit', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+.stars-bg {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(2px 2px at 20px 30px, #eee, transparent), radial-gradient(2px 2px at 40px 70px, #fff, transparent), radial-gradient(2px 2px at 50px 160px, #ddd, transparent), radial-gradient(2px 2px at 90px 40px, #fff, transparent), radial-gradient(2px 2px at 130px 80px, #fff, transparent), radial-gradient(2px 2px at 160px 120px, #ddd, transparent);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.music-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    position: relative;
+    z-index: 10;
+}
+
+.hidden-section {
+    display: none;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: var(--accent);
+}
+
+.moon {
+    font-size: 4rem;
+    margin-bottom: 24px;
+    filter: drop-shadow(0 0 20px var(--accent));
+}
+
+h1 {
+    font-size: 2.8rem;
+    margin-bottom: 12px;
+}
+
+p {
+    opacity: 0.7;
+    margin-bottom: 40px;
+}
+
+.btn-mid {
+    padding: 14px 36px;
+    background: linear-gradient(135deg, var(--accent), var(--dim));
+    color: white;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 100px;
+    cursor: pointer;
+    margin-top: 30px;
+    box-shadow: 0 8px 25px rgba(129, 140, 248, 0.3);
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    max-width: 800px;
+    width: 100%;
+}
+
+.gallery-grid img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.letter-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    max-width: 500px;
+    padding: 48px;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.letter-card h2 {
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+    color: var(--accent);
+}
+
+.letter-card p {
+    line-height: 1.9;
+    white-space: pre-wrap;
+    opacity: 0.9;
+}
+
+.sig {
+    margin-top: 30px;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 450px;
+    width: 100%;
+}
+
+.timeline-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid var(--accent);
+}
+
+.timeline-date {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.quiz-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: 400px;
+    width: 100%;
+}
+
+.quiz-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.quiz-btn.correct {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: #22c55e;
+}
+
+.quiz-btn.wrong {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+}
+
+.gift-box {
+    cursor: pointer;
+}
+
+.gift-box span {
+    font-size: 5rem;
+    filter: drop-shadow(0 0 15px var(--accent));
+}
+
+#gift-content img {
+    max-width: 260px;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.finale-content {
+    text-align: center;
+}
+
+.finale-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.btn-yes {
+    padding: 16px 48px;
+    background: linear-gradient(135deg, var(--accent), var(--dim));
+    border: none;
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.btn-no {
+    padding: 16px 48px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text);
+    border-radius: 100px;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.hidden {
+    display: none !important;
+}

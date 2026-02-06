@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine Gift</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Cinzel:wght@400;700&family=Dancing+Script:wght@400;700&family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e11d48;
+            --primary-rgb: 225, 29, 72;
+            --text: #1a1a1a;
+            --bg: #fffcf9;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Playfair Display', serif;
+            --font-script: 'Great Vibes', cursive;
+        }
+
+        /* THEME PRESETS (Preserving existing logic) */
+        /* =========================================
+           THEME ENGINE - UNIQUE IDENTITIES
+           ========================================= */
+
+        /* --- CLASSIC & ROMANTIC --- */
+        [data-style="romantic"],
+        [data-style="classic"] {
+            --primary: #e11d48;
+            --text: #1a1a1a;
+            --bg: #fffcf9;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            background-image: radial-gradient(#e11d48 0.5px, transparent 0.5px), radial-gradient(#e11d48 0.5px, #fffcf9 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        [data-style="rose_garden"] {
+            --primary: #be123c;
+            --text: #2c0b0e;
+            --bg: #ffe4e6;
+            --card-bg: rgba(255, 241, 242, 0.9);
+            border-image: linear-gradient(to right, #be123c, #fb7185) 1;
+        }
+
+        [data-style="luxury"] {
+            --primary: #d4af37;
+            --text: #f8fafc;
+            --bg: #09090b;
+            --card-bg: rgba(20, 20, 20, 0.95);
+            background: #000;
+            --font-display: 'Cinzel', serif;
+        }
+
+        [data-style="luxury"] .reason-card,
+        [data-style="luxury"] .timeline-content {
+            border: 1px solid #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        [data-style="minimal"] {
+            --primary: #000;
+            --text: #000;
+            --bg: #fff;
+            --card-bg: #fff;
+            --font-display: 'Inter', sans-serif;
+            --font-main: 'Inter', sans-serif;
+        }
+
+        [data-style="minimal"] .reason-card {
+            box-shadow: none;
+            border: 1px solid #000;
+            border-radius: 0;
+        }
+
+        [data-style="minimal"] .pulsing-heart {
+            fill: #000;
+            filter: none;
+        }
+
+        /* --- RETRO & VINTAGE --- */
+        [data-style="pixel"] {
+            --primary: #3b82f6;
+            --text: #fff;
+            --bg: #1a1a1a;
+            --card-bg: #000;
+            image-rendering: pixelated;
+            font-family: 'Courier New', monospace;
+        }
+
+        [data-style="pixel"] .reason-card {
+            border: 4px solid var(--primary);
+            box-shadow: 8px 8px 0px var(--primary);
+            border-radius: 0;
+        }
+
+        [data-style="vintage"] {
+            --primary: #8b4513;
+            --text: #3e2723;
+            --bg: #f4e4bc;
+            background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+            --font-display: 'Playfair Display', serif;
+        }
+
+        [data-style="vintage"] .reason-card {
+            background: #e8dcc5;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+            transform: rotate(-1deg);
+        }
+
+        [data-style="polaroid"] {
+            --primary: #be123c;
+            --text: #333;
+            --bg: #e5e5e5;
+            --card-bg: #fff;
+        }
+
+        [data-style="polaroid"] .reason-card {
+            padding: 15px 15px 40px 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transform: rotate(2deg);
+            border-radius: 0;
+        }
+
+        [data-style="polaroid"] .reason-card:nth-child(even) {
+            transform: rotate(-1deg);
+        }
+
+        /* --- NATURE & ORGANIC --- */
+        [data-style="nature"] {
+            --primary: #15803d;
+            --text: #052e16;
+            --bg: #f0fdf4;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.62 50l-6.363 6.364a3 3 0 0 1-4.243 0L39.77 52.12a3 3 0 0 1 0-4.243l6.364-6.364a3 3 0 0 1 4.243 0L54.62 50zm-33.15 0l-6.363 6.364a3 3 0 0 1-4.243 0L6.626 52.12a3 3 0 0 1 0-4.243l6.364-6.364a3 3 0 0 1 4.243 0L21.47 50zM5.314 30.556l6.364-6.364a3 3 0 0 1 4.243 0l4.242 4.242a3 3 0 0 1 0 4.243l-6.364 6.364a3 3 0 0 1-4.243 0L5.314 34.8a3 3 0 0 1 0-4.243zM38.455 30.556l6.364-6.364a3 3 0 0 1 4.243 0l4.242 4.242a3 3 0 0 1 0 4.243l-6.364 6.364a3 3 0 0 1-4.243 0L38.455 34.8a3 3 0 0 1 0-4.243z' fill='%2315803d' fill-opacity='0.05' fill-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
+        }
+
+        [data-style="ocean"],
+        [data-style="underwater"] {
+            --primary: #0ea5e9;
+            --text: #0c4a6e;
+            --bg: #e0f2fe;
+            --card-bg: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(8px);
+        }
+
+        [data-style="ocean"] .reason-card {
+            border-radius: 40px 40px 40px 4px;
+            border: 2px solid #bae6fd;
+        }
+
+        [data-style="sunset"],
+        [data-style="meadow"] {
+            --primary: #f97316;
+            --text: #431407;
+            --bg: linear-gradient(to bottom, #ffedd5, #fdba74);
+            --card-bg: rgba(255, 255, 255, 0.6);
+        }
+
+        [data-style="cloud"] {
+            --primary: #6366f1;
+            --text: #312e81;
+            --bg: #eef2ff;
+            --card-bg: #fff;
+        }
+
+        [data-style="cloud"] .reason-card {
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        /* --- MODERN & APP --- */
+        [data-style="music"] {
+            --primary: #1db954;
+            --text: #fff;
+            --bg: #121212;
+            --card-bg: #181818;
+            --font-display: 'Inter', sans-serif;
+            background: linear-gradient(to bottom, #400000, #121212 40%);
+        }
+
+        [data-style="music"] .reason-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            text-align: left;
+            transition: background 0.2s;
+        }
+
+        [data-style="music"] .reason-card:hover {
+            background: #282828;
+            transform: none;
+            box-shadow: none;
+        }
+
+        [data-style="music"] .reason-card h3 {
+            margin: 0;
+            font-size: 1rem;
+            color: #fff;
+            flex: 1;
+        }
+
+        [data-style="music"] .reason-card p {
+            font-size: 0.9rem;
+            color: #b3b3b3;
+            margin: 0;
+        }
+
+        [data-style="music"] .reason-card::before {
+            content: '▶';
+            color: #fff;
+            font-size: 0.8rem;
+        }
+
+        [data-style="stream"] {
+            --primary: #e50914;
+            --text: #fff;
+            --bg: #141414;
+            --card-bg: #1f1f1f;
+            background: #141414;
+        }
+
+        [data-style="stream"] #hero {
+            align-items: flex-start;
+            text-align: left;
+            padding-left: 5%;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, transparent 100%), url('https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 80vh;
+            min-height: auto;
+        }
+
+        [data-style="stream"] .reason-card {
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background: #333;
+            border: none;
+        }
+
+        [data-style="stream"] .reason-card::after {
+            content: '';
+            height: 4px;
+            width: 40%;
+            background: #e50914;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        [data-style="chat"] {
+            --primary: #0084ff;
+            --text: #1a1a1a;
+            --bg: #e5ddd5;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10h10v10H10V10zm20 20h10v10H30V30zM10 50h10v10H10V50zm40 0h10v10H50V50zm20-20h10v10H70V30zM50 10h10v10H50V10z' fill='%23000000' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        [data-style="chat"] .container {
+            max-width: 600px;
+        }
+
+        [data-style="chat"] .reason-card {
+            background: #dcf8c6;
+            color: #000;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            width: fit-content;
+            max-width: 80%;
+            position: relative;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+            border: none;
+            align-self: flex-end;
+            margin-left: auto;
+            text-align: left;
+        }
+
+        [data-style="chat"] .reason-card:nth-child(even) {
+            background: #fff;
+            margin-left: 0;
+            margin-right: auto;
+            align-self: flex-start;
+        }
+
+        [data-style="chat"] .reasons-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        [data-style="chat"] .reason-card h3 {
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 2px;
+            font-family: sans-serif;
+            font-weight: 600;
+        }
+
+        [data-style="chat"] .reason-card p {
+            font-size: 1rem;
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        [data-style="social"] {
+            --primary: #ed4956;
+            --text: #262626;
+            --bg: #fafafa;
+            --card-bg: #fff;
+        }
+
+        [data-style="social"] .reasons-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        [data-style="social"] .reason-card {
+            width: 100%;
+            max-width: 470px;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            padding: 0;
+            text-align: left;
+            box-shadow: none;
+            background: #fff;
+        }
+
+        [data-style="social"] .reason-card h3 {
+            padding: 15px;
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-bottom: 1px solid #efefef;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        [data-style="social"] .reason-card h3::before {
+            content: '';
+            width: 30px;
+            height: 30px;
+            background: #ddd;
+            border-radius: 50%;
+            display: block;
+        }
+
+        [data-style="social"] .reason-card p {
+            padding: 15px;
+            margin: 0;
+        }
+
+
+        /* --- ABSTRACT & SCI-FI --- */
+        [data-style="neon"],
+        [data-style="cyberpunk"],
+        [data-style="citynight"] {
+            --primary: #d946ef;
+            --text: #fff;
+            --bg: #050505;
+            --card-bg: rgba(20, 20, 20, 0.8);
+            text-shadow: 0 0 10px rgba(217, 70, 239, 0.5);
+            background: #000;
+        }
+
+        [data-style="citynight"] {
+            background: linear-gradient(to bottom, #020024 0%, #090979 35%, #00d4ff 100%);
+            /* Add skyline silhouette if possible, or use CSS shapes */
+        }
+
+
+        [data-style="neon"] .reason-card {
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 15px var(--primary), inset 0 0 10px rgba(217, 70, 239, 0.2);
+        }
+
+        [data-style="cosmic"],
+        [data-style="galaxy"] {
+            --primary: #8b5cf6;
+            --text: #fff;
+            --bg: #0f0c29;
+            background: radial-gradient(circle at center, #240b36, #0f0c29);
+        }
+
+        [data-style="aurora"] {
+            --primary: #22d3ee;
+            --text: #fff;
+            --bg: #0f172a;
+            background: linear-gradient(135deg, #0f172a, #0c4a6e, #1e293b);
+            background-size: 400% 400%;
+            animation: auroraShift 20s ease infinite;
+        }
+
+        [data-style="dark"] {
+            --bg: #09090b;
+            --text: #f8fafc;
+            --card-bg: rgba(24, 24, 27, 0.8);
+        }
+
+        @keyframes auroraShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Floating Hearts Background */
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart-particle {
+            position: absolute;
+            color: var(--primary);
+            opacity: 0.3;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(110vh) translateX(0) rotate(0deg);
+            }
+
+            to {
+                transform: translateY(-10vh) translateX(50px) rotate(360deg);
+            }
+        }
+
+        /* Sections */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Hero Section */
+        #hero {
+            text-align: center;
+        }
+
+        .pulsing-heart {
+            width: 120px;
+            height: 120px;
+            fill: var(--primary);
+            animation: heartBeat 1.5s infinite ease-out;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 10px rgba(var(--primary-rgb), 0.5));
+        }
+
+        @keyframes heartBeat {
+            0% {
+                transform: scale(1);
+            }
+
+            15% {
+                transform: scale(1.25);
+            }
+
+            30% {
+                transform: scale(1);
+            }
+
+            45% {
+                transform: scale(1.15);
+            }
+
+            60% {
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .hero-tagline {
+            font-size: 1.5rem;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        /* Reasons Grid */
+        .reasons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+        }
+
+        .reason-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 40px 30px;
+            border-radius: 24px;
+            border: 1px solid rgba(var(--primary-rgb), 0.1);
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .reason-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(var(--primary-rgb), 0.1);
+        }
+
+        .reason-card h3 {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        /* Timeline */
+        .timeline-container {
+            position: relative;
+            padding: 50px 0;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(var(--primary-rgb), 0.2);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            margin-bottom: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-date {
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .timeline-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        /* Love Letter */
+        .letter-card {
+            background: #fff;
+            padding: 60px;
+            border-radius: 2px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transform: rotate(-1deg);
+            max-width: 700px;
+            margin: 0 auto;
+            color: #333;
+        }
+
+        .letter-card p {
+            font-family: var(--font-script);
+            font-size: 2rem;
+            line-height: 1.4;
+            color: #444;
+        }
+
+        .letter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(#fff, #fff 31px, #e5e5e5 31px, #e5e5e5 32px);
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        /* Finale */
+        .finale-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 10px 25px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .finale-btn:hover {
+            transform: scale(1.1);
+            background: #be123c;
+        }
+
+        .finale-btn svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .timeline-container::before {
+                left: 20px;
+            }
+
+            .timeline-content {
+                width: 85%;
+            }
+
+            .timeline-item {
+                justify-content: flex-start;
+            }
+
+            .timeline-item:nth-child(even) {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+
+<body data-style="romantic">
+    <div class="floating-hearts" id="heartPool"></div>
+
+    <!-- 1. Hero Section -->
+    <section id="hero">
+        <svg class="pulsing-heart" viewBox="0 0 32 32">
+            <path
+                d="M16 28.5L14.5 27C9.2 22.3 5.7 19.1 5.7 15.2C5.7 12 8.2 9.5 11.4 9.5C13.2 9.5 14.9 10.3 16 11.7C17.1 10.3 18.8 9.5 20.6 9.5C23.8 9.5 26.3 12 26.3 15.2C26.3 19.1 22.8 22.3 17.5 27L16 28.5Z" />
+        </svg>
+        <h1 id="partnerNameDisplay">My Forever</h1>
+        <p class="hero-tagline" id="taglineDisplay">To the love of my life</p>
+    </section>
+
+    <!-- 2. Reasons Section -->
+    <section id="reasons">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up"
+                style="text-align: center; font-family: var(--font-display); font-size: 3rem; margin-bottom: 50px;">
+                Reasons I Love You</h2>
+            <div class="reasons-grid" id="reasonsGrid">
+                <!-- Will be populated via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Timeline Section -->
+    <section id="timelineSection" class="hidden">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up"
+                style="text-align: center; font-family: var(--font-display); font-size: 3rem; margin-bottom: 50px;">Our
+                Journey</h2>
+            <div class="timeline-container" id="timelineList">
+                <!-- Will be populated via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Love Letter -->
+    <section id="letter">
+        <div class="container" data-aos="zoom-in">
+            <div class="letter-card">
+                <p id="loveMessage">My Dearest...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Interactive Finale -->
+    <section id="finale">
+        <div data-aos="fade-up" style="text-align: center;">
+            <h2 style="font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 30px;">I Have One Small
+                Question...</h2>
+            <button class="finale-btn" onclick="triggerFinale()">
+                <span>Will You Be Mine?</span>
+                <svg viewBox="0 0 32 32">
+                    <path
+                        d="M16 28.5L14.5 27C9.2 22.3 5.7 19.1 5.7 15.2C5.7 12 8.2 9.5 11.4 9.5C13.2 9.5 14.9 10.3 16 11.7C17.1 10.3 18.8 9.5 20.6 9.5C23.8 9.5 26.3 12 26.3 15.2C26.3 19.1 22.8 22.3 17.5 27L16 28.5Z" />
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <!-- AUDIO -->
+    <audio id="bgMusic" loop></audio>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000, once: true });
+
+        // CONFIG DEFAULT
+        const DEFAULT_CONFIG = {
+            style: 'romantic',
+            primaryColor: '#e11d48',
+            partnerName: "My Love",
+            tagline: "To the love of my life",
+            message: "Every moment with you is magic...",
+            reasons: [
+                { title: "Your Smile", body: "It lights up my darkest days." },
+                { title: "Your Kindness", body: "The way you care for everyone around you." },
+                { title: "Your Support", body: "You are always there when I need you." },
+                { title: "Your Laugh", body: "The sweetest sound I've ever heard." },
+                { title: "Your Heart", body: "Generous, loving, and beautiful." },
+                { title: "Your Presence", body: "Simply being near you is enough." }
+            ],
+            timeline: [
+                { date: "The Day We Met", title: "First Spells", desc: "I knew you were special from the start." }
+            ],
+            features: ['feature_confetti']
+        };
+
+        let config = window.VALENTINE_CONFIG || DEFAULT_CONFIG;
+        let features = window.VALENTINE_FEATURES || config.features || [];
+
+        function createHearts() {
+            const pool = document.getElementById('heartPool');
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart-particle';
+                    heart.innerHTML = '❤';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                    heart.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                    pool.appendChild(heart);
+
+                    // Cleanup
+                    setTimeout(() => heart.remove(), 10000);
+                }, i * 500);
+            }
+        }
+
+        function init() {
+            // Apply Theme
+            document.body.setAttribute('data-style', config.style || 'romantic');
+            if (config.primaryColor) {
+                document.documentElement.style.setProperty('--primary', config.primaryColor);
+                // Convert to RGB for glow effects
+                const hex = config.primaryColor.replace('#', '');
+                const r = parseInt(hex.substring(0, 2), 16);
+                const g = parseInt(hex.substring(2, 4), 16);
+                const b = parseInt(hex.substring(4, 6), 16);
+                document.documentElement.style.setProperty('--primary-rgb', `${r}, ${g}, ${b}`);
+            }
+
+            // Hero
+            document.getElementById('partnerNameDisplay').innerText = config.partnerName || "My Love";
+            document.getElementById('taglineDisplay').innerText = config.tagline || "To the love of my life";
+
+            // Reasons
+            const reasonsGrid = document.getElementById('reasonsGrid');
+            reasonsGrid.innerHTML = '';
+            const reasons = config.reasons || DEFAULT_CONFIG.reasons;
+            reasons.forEach(reason => {
+                const card = document.createElement('div');
+                card.className = 'reason-card';
+                card.setAttribute('data-aos', 'fade-up');
+                card.innerHTML = `<h3>${reason.title}</h3><p>${reason.body}</p>`;
+                reasonsGrid.appendChild(card);
+            });
+
+            // Timeline
+            if (features.includes('feature_timeline') || (config.timeline && config.timeline.length > 0)) {
+                document.getElementById('timelineSection').classList.remove('hidden');
+                const timelineList = document.getElementById('timelineList');
+                timelineList.innerHTML = '';
+                const items = config.timeline || DEFAULT_CONFIG.timeline;
+                items.forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'timeline-item';
+                    el.setAttribute('data-aos', 'fade-right');
+                    el.innerHTML = `
+                        <div class="timeline-content">
+                            <div class="timeline-date">${item.date}</div>
+                            <div class="timeline-title">${item.title}</div>
+                            <p>${item.desc || item.description}</p>
+                        </div>
+                    `;
+                    timelineList.appendChild(el);
+                });
+            }
+
+            // Message
+            document.getElementById('loveMessage').innerText = config.message || DEFAULT_CONFIG.message;
+
+            // Music
+            if (config.musicUrl) {
+                const audio = document.getElementById('bgMusic');
+                audio.src = config.musicUrl;
+                audio.play().catch(() => console.log("Autoplay blocked"));
+            }
+
+            createHearts();
+            setInterval(createHearts, 10000);
+        }
+
+        function triggerFinale() {
+            const count = 200;
+            const defaults = { origin: { y: 0.7 }, colors: [config.primaryColor, '#ffffff', '#ff85a1'] };
+
+            function fire(particleRatio, opts) {
+                confetti({ ...defaults, ...opts, particleCount: Math.floor(count * particleRatio) });
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+
+            // Show a sweet alert or change text
+            setTimeout(() => {
+                alert("I'm so lucky to have you! ❤️");
+            }, 1000);
+        }
+
+        init();
+
+        // Preview live updates
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'UPDATE_CONFIG') {
+                config = { ...config, ...e.data.payload };
+                features = e.data.payload.features || [];
+                init();
+            }
+        });
+    </script>
+</body>
+
+</html>

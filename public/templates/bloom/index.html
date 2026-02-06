@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloom Garden 🌸</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <audio id="bgMusic" loop>
+        <source src="" type="audio/mp3">
+    </audio>
+    <button id="musicToggle" class="music-btn">🎵</button>
+
+    <!-- Floating Petals -->
+    <div class="floating-petals" id="petals"></div>
+    <div class="bg-overlay"></div>
+
+    <!-- HERO -->
+    <section id="hero" class="section">
+        <div class="hero-content">
+            <div class="flower-icon">🌷</div>
+            <h1 class="hero-title">For You, My Love</h1>
+            <p class="hero-subtitle">A garden of memories, just for you</p>
+            <button class="btn-bloom" id="start-btn">Open Your Gift 🌸</button>
+        </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery-section" class="section hidden-section">
+        <div class="section-header">
+            <h2>Our Beautiful Moments</h2>
+            <p>Every picture tells our story</p>
+        </div>
+        <div class="gallery-grid" id="gallery"></div>
+        <button class="btn-bloom" id="next-to-letter">Read My Letter 💌</button>
+    </section>
+
+    <!-- LETTER -->
+    <section id="letter-section" class="section hidden-section">
+        <div class="letter-card">
+            <div class="letter-flower">🌺</div>
+            <h2 id="letter-title">My Dearest,</h2>
+            <p id="letter-body" class="letter-text">...</p>
+            <div class="letter-signature">
+                <span>Forever yours,</span>
+                <strong id="sender-name">Your Love</strong>
+            </div>
+        </div>
+        <button class="btn-bloom" id="next-to-timeline">Our Journey 🌿</button>
+    </section>
+
+    <!-- TIMELINE -->
+    <section id="timeline-section" class="section hidden-section">
+        <div class="section-header">
+            <h2>How Our Love Bloomed</h2>
+        </div>
+        <div class="timeline" id="timeline"></div>
+        <button class="btn-bloom" id="next-to-quiz">Love Quiz 🌻</button>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz-section" class="section hidden-section">
+        <div class="section-header">
+            <h2 id="quiz-question">Question</h2>
+        </div>
+        <div class="quiz-grid" id="quiz-options"></div>
+        <button class="btn-bloom hidden" id="next-to-gift">Your Gift 🎁</button>
+    </section>
+
+    <!-- GIFT -->
+    <section id="gift-section" class="section hidden-section">
+        <div class="section-header">
+            <h2>A Special Gift</h2>
+        </div>
+        <div class="gift-box" id="gift-box">
+            <div class="gift-top">🎀</div>
+            <div class="gift-body">🎁</div>
+            <p class="gift-hint">tap to unwrap</p>
+        </div>
+        <div id="gift-content" class="hidden">
+            <img id="gift-image" src="" alt="Gift">
+            <p id="gift-message"></p>
+        </div>
+        <button class="btn-bloom hidden" id="next-to-finale">Final Question 🌹</button>
+    </section>
+
+    <!-- FINALE -->
+    <section id="finale-section" class="section hidden-section">
+        <div class="finale-content">
+            <div class="finale-flowers">🌸🌷🌺</div>
+            <h1 class="finale-question" id="question-text">Will you be my Valentine?</h1>
+            <div class="finale-buttons">
+                <button id="yes-btn" class="btn-yes">Yes! 💕</button>
+                <button id="no-btn" class="btn-no">Maybe...</button>
+            </div>
+            <div id="success-message" class="hidden">
+                <div class="success-blooms">🌸🌷🌺🌻🌹</div>
+                <h1>I'm So Happy!</h1>
+                <p>Happy Valentine's Day, my love! 💕</p>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
