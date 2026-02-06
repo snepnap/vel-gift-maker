@@ -4,225 +4,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For You ❤️</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=Dancing+Script:wght@700&display=swap"
+    <title>Cosmic Love</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo+2:wght@300;600&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --bg: #0f0c29;
+            --text: #fff;
+            --card-glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #240b36, #0f0c29);
+            color: var(--text);
+            font-family: 'Exo 2', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Starfield Animation */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: transparent;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(0.8);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 80px 20px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            letter-spacing: 2px;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        /* Glass Cards */
+        .universe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .planet-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            transition: all 0.4s;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .planet-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .planet-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .planet-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        /* Floating Planet Decor */
+        .floating-planet {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #ff00cc, #333399);
+            border-radius: 50%;
+            position: fixed;
+            top: 10%;
+            right: 10%;
+            z-index: 1;
+            opacity: 0.6;
+            box-shadow: 0 0 50px rgba(255, 0, 204, 0.4);
+            animation: float 10s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Black Hole Button */
+        .event-horizon-btn {
+            margin-top: 80px;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: white;
+            padding: 20px 50px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--primary), inset 0 0 20px var(--primary);
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .event-horizon-btn:hover {
+            background: var(--primary);
+            box-shadow: 0 0 50px var(--primary);
+        }
+    </style>
 </head>
 
 <body>
-    <audio id="bgMusic" loop>
-        <source src="" type="audio/mp3">
-    </audio>
+    <div class="stars" id="starContainer"></div>
+    <div class="floating-planet"></div>
 
-    <!-- Cursor Trail -->
-    <div id="cursor-trail"></div>
+    <div class="content-layer">
+        <h1 id="partnerNameDisplay">COSMIC LOVE</h1>
+        <p class="subtitle" id="taglineDisplay">OUR LOVE IS INFINITE</p>
 
-    <!-- Music Button -->
-    <button id="musicToggle" class="music-btn">🎵</button>
-
-    <!-- Progress Bar -->
-    <div class="progress-bar" id="progressBar"></div>
-
-    <!-- Animated Background -->
-    <div class="bg-gradient"></div>
-    <canvas id="particles"></canvas>
-    <div class="floating-hearts" id="hearts"></div>
-
-    <!-- SECTION 1: HERO -->
-    <section id="hero" class="section section-hero">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <span class="pulse-dot"></span>
-                <span>February 14, 2026</span>
-            </div>
-
-            <div class="envelope-wrapper" id="envelope">
-                <div class="envelope">
-                    <div class="envelope-flap"></div>
-                    <div class="envelope-body">
-                        <div class="letter-peek">
-                            <span>💌</span>
-                        </div>
-                    </div>
-                    <div class="envelope-shadow"></div>
-                </div>
-                <p class="envelope-hint">tap to open</p>
-            </div>
-
-            <h1 class="hero-title">
-                <span class="line reveal-text">A little something</span>
-                <span class="line gradient-text reveal-text" style="animation-delay: 0.2s">for you.</span>
-            </h1>
-
-            <p class="hero-subtitle reveal-text" style="animation-delay: 0.4s">Made with love, just for you ✨</p>
+        <div class="universe-grid" id="reasonsGrid">
+            <!-- JS Populated -->
         </div>
 
-        <div class="scroll-indicator">
-            <div class="mouse">
-                <div class="wheel"></div>
-            </div>
-            <span>scroll down</span>
-            <div class="scroll-arrow">↓</div>
-        </div>
-    </section>
-
-    <!-- SECTION 2: GALLERY -->
-    <section id="gallery-section" class="section">
-        <div class="section-header">
-            <span class="section-label">✨ Our Memories</span>
-            <h2 class="section-title">Happy Valentine's Day</h2>
-            <p class="section-subtitle">Every moment with you is a treasure</p>
-        </div>
-
-        <div class="gallery-masonry" id="gallery">
-            <!-- Images injected by JS -->
-        </div>
-
-        <button class="next-btn magnetic-btn" id="next-to-letter">
-            <span class="btn-text">Read My Letter</span>
-            <span class="btn-icon">→</span>
-        </button>
-    </section>
-
-    <!-- SECTION 3: LETTER -->
-    <section id="letter-section" class="section">
-        <div class="letter-card tilt-card">
-            <div class="letter-seal">💕</div>
-            <div class="letter-header">
-                <span class="letter-date">February 14, 2026</span>
-            </div>
-            <h2 id="letter-title" class="letter-greeting">My Dearest,</h2>
-            <div id="letter-body" class="letter-content typewriter">...</div>
-            <div class="letter-signature">
-                <span>With all my love,</span>
-                <strong id="sender-name" class="signature-name">Your Valentine</strong>
-            </div>
-            <div class="letter-decoration">💝</div>
-        </div>
-        <button class="next-btn magnetic-btn" id="next-to-timeline">
-            <span class="btn-text">Our Story</span>
-            <span class="btn-icon">→</span>
-        </button>
-    </section>
-
-    <!-- SECTION 4: TIMELINE -->
-    <section id="timeline-section" class="section">
-        <div class="section-header">
-            <span class="section-label">📖 Our Journey</span>
-            <h2 class="section-title">How It All Began</h2>
-        </div>
-        <div class="timeline-wrapper">
-            <div class="timeline-line"></div>
-            <div class="timeline" id="timeline">
-                <!-- Timeline items injected by JS -->
-            </div>
-        </div>
-        <button class="next-btn magnetic-btn" id="next-to-quiz">
-            <span class="btn-text">Take Quiz</span>
-            <span class="btn-icon">❓</span>
-        </button>
-    </section>
-
-    <!-- SECTION 5: QUIZ -->
-    <section id="quiz-section" class="section">
-        <div class="section-header">
-            <span class="section-label">🧠 Love Quiz</span>
-            <h2 class="section-title" id="quiz-question">How well do you know us?</h2>
-        </div>
-        <div class="quiz-container">
-            <div class="quiz-grid" id="quiz-options">
-                <!-- Options injected by JS -->
-            </div>
-            <div id="quiz-feedback" class="quiz-feedback hidden"></div>
-        </div>
-        <button class="next-btn magnetic-btn hidden" id="next-to-gift">
-            <span class="btn-text">Claim Gift</span>
-            <span class="btn-icon">🎁</span>
-        </button>
-    </section>
-
-    <!-- SECTION 6: GIFT -->
-    <section id="gift-section" class="section">
-        <div class="section-header">
-            <span class="section-label">🎁 Special Gift</span>
-            <h2 class="section-title">A Little Surprise</h2>
-        </div>
-        <div class="gift-scene">
-            <div class="gift-box-wrapper" id="gift-box">
-                <div class="gift-box">
-                    <div class="gift-lid">
-                        <div class="gift-bow">
-                            <div class="bow-left"></div>
-                            <div class="bow-right"></div>
-                            <div class="bow-knot"></div>
-                        </div>
-                    </div>
-                    <div class="gift-base">
-                        <div class="gift-ribbon"></div>
-                    </div>
-                </div>
-                <p class="gift-hint">tap to unwrap</p>
-            </div>
-        </div>
-        <div id="gift-content" class="hidden">
-            <div class="gift-reveal">
-                <img id="gift-image" src="" alt="Gift" class="gift-img">
-                <p id="gift-message" class="gift-text"></p>
-            </div>
-        </div>
-        <button class="next-btn magnetic-btn hidden" id="next-to-finale">
-            <span class="btn-text">Final Question</span>
-            <span class="btn-icon">💕</span>
-        </button>
-    </section>
-
-    <!-- SECTION 7: FINALE -->
-    <section id="finale-section" class="section section-finale">
-        <div class="finale-content">
-            <div class="finale-hearts">
-                <span class="floating-heart" style="--delay: 0s">💕</span>
-                <span class="floating-heart" style="--delay: 0.5s">💖</span>
-                <span class="floating-heart" style="--delay: 1s">💗</span>
-            </div>
-            <h1 class="finale-question" id="question-text">Will you be my Valentine?</h1>
-            <div class="finale-buttons">
-                <button id="yes-btn" class="btn-yes pulse-btn">
-                    <span>Yes!</span>
-                    <span class="btn-hearts">💕</span>
-                </button>
-                <button id="no-btn" class="btn-no">Maybe later</button>
-            </div>
-            <div id="success-message" class="hidden">
-                <div class="success-animation">
-                    <div class="heart-burst">
-                        <span>❤️</span>
-                    </div>
-                </div>
-                <h1 class="success-title">I Knew It!</h1>
-                <p class="success-subtitle">Happy Valentine's Day, my love!</p>
-                <div class="success-emojis">
-                    <span>🎉</span><span>💕</span><span>✨</span><span>🥰</span><span>💖</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Lightbox -->
-    <div id="lightbox" class="lightbox hidden">
-        <button class="lightbox-close">×</button>
-        <img id="lightbox-img" src="" alt="">
+        <button class="event-horizon-btn" onclick="triggerFinale()">ENTER ORBIT (YES)</button>
     </div>
 
-    <!-- Countdown (Optional) -->
-    <div id="countdown-container" class="hidden"></div>
+    <script>
+        const DEFAULT_CONFIG = {
+            style: 'cosmic',
+            partnerName: "My Universe",
+            tagline: "Together until the end of time...",
+            reasons: [
+                { title: "Gravity", body: "You pull me in." },
+                { title: "Starlight", body: "You guide my way." }
+            ]
+        };
 
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="config.js"></script>
-    <script src="script.js"></script>
+        let config = window.VALENTINE_CONFIG || DEFAULT_CONFIG;
+
+        function createStars() {
+            const container = document.getElementById('starContainer');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(star);
+            }
+        }
+
+        function init() {
+            document.getElementById('partnerNameDisplay').innerText = config.partnerName || "COSMIC LOVE";
+            document.getElementById('taglineDisplay').innerText = (config.tagline || "INFINITE").toUpperCase();
+
+            const grid = document.getElementById('reasonsGrid');
+            grid.innerHTML = '';
+
+            (config.reasons || []).forEach((r, i) => {
+                const div = document.createElement('div');
+                div.className = 'planet-card';
+                div.innerHTML = `
+                    <span class="planet-icon">🪐</span>
+                    <h3>${r.title}</h3>
+                    <p>${r.body}</p>
+                `;
+                grid.appendChild(div);
+            });
+
+            createStars();
+        }
+
+        function triggerFinale() {
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#8b5cf6', '#ffffff', '#22d3ee']
+            });
+            alert("🚀 LAUNCHING TO LOVE! 🚀");
+        }
+
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'UPDATE_CONFIG') {
+                config = { ...config, ...e.data.payload };
+                init();
+            }
+        });
+
+        init();
+    </script>
 </body>
 
 </html>

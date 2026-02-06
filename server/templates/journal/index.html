@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Scrapbook</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --paper-bg: #fdfbf7;
+            --ink: #2c3e50;
+            --accent: #c0392b;
+            --tape: rgba(255, 255, 255, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #e0d4c1;
+            background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
+            color: var(--ink);
+            font-family: 'Indie Flower', cursive;
+            padding: 40px 20px;
+        }
+
+        .book-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--paper-bg);
+            padding: 60px;
+            box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            min-height: 90vh;
+            border-left: 20px solid #dcdcdc;
+            /* spine */
+        }
+
+        .book-container::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--ink);
+            padding-bottom: 15px;
+        }
+
+        .tagline {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 50px;
+            font-style: italic;
+            color: #555;
+        }
+
+        /* Polaroids / Notes */
+        .grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .scrap-item {
+            background: #fff;
+            padding: 15px 15px 40px 15px;
+            width: 250px;
+            box-shadow: 2px 5px 15px rgba(0, 0, 0, 0.15);
+            position: relative;
+            transform: rotate(2deg);
+            transition: transform 0.3s;
+        }
+
+        .scrap-item:nth-child(even) {
+            transform: rotate(-3deg);
+        }
+
+        .scrap-item:hover {
+            transform: scale(1.05) rotate(0);
+            z-index: 10;
+        }
+
+        .scrap-item::before {
+            content: '';
+            width: 100px;
+            height: 30px;
+            background: rgba(255, 255, 200, 0.4);
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #eee;
+            margin-bottom: 15px;
+            background-size: cover;
+            background-position: center;
+            filter: sepia(0.3);
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        /* Stamp */
+        .stamp {
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            border: 3px solid var(--accent);
+            color: var(--accent);
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transform: rotate(-15deg);
+            opacity: 0.7;
+            font-size: 1.5rem;
+        }
+
+        /* Button */
+        .love-btn {
+            display: block;
+            margin: 60px auto 0;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(192, 57, 43, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .love-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="book-container">
+        <h1 id="partnerNameDisplay">Journal of Us</h1>
+        <p class="tagline" id="taglineDisplay">Written in the stars...</p>
+
+        <div class="grid" id="reasonsGrid">
+            <!-- JS Populated -->
+        </div>
+
+        <div class="stamp">APPROVED</div>
+
+        <button class="love-btn" onclick="triggerFinale()">Be Mine?</button>
+    </div>
+
+    <script>
+        const DEFAULT_CONFIG = {
+            style: 'vintage',
+            partnerName: "My Love",
+            tagline: "Every page is you...",
+            reasons: [
+                { title: "First Glance", body: "I knew instantly." },
+                { title: "Lazy Sundays", body: "Coffee and cuddles." }
+            ]
+        };
+
+        let config = window.VALENTINE_CONFIG || DEFAULT_CONFIG;
+
+        function init() {
+            document.getElementById('partnerNameDisplay').innerText = config.partnerName || "Our Story";
+            document.getElementById('taglineDisplay').innerText = config.tagline || "Written with love...";
+
+            const grid = document.getElementById('reasonsGrid');
+            grid.innerHTML = '';
+
+            (config.reasons || []).forEach((r, i) => {
+                const div = document.createElement('div');
+                div.className = 'scrap-item';
+                div.innerHTML = `
+                    <div class="photo-placeholder" style="background-image: url('https://source.unsplash.com/random/300x300?sig=${i}&love')"></div>
+                    <h3>${r.title}</h3>
+                    <p>${r.body}</p>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function triggerFinale() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#c0392b', '#ffffff'],
+                shapes: ['circle']
+            });
+            alert("💖 Signed, Sealed, Delivered! 💖");
+        }
+
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'UPDATE_CONFIG') {
+                config = { ...config, ...e.data.payload };
+                init();
+            }
+        });
+
+        init();
+    </script>
+</body>
+
+</html>

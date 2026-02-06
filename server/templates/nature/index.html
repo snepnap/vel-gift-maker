@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nature's Love</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Nunito:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #4ade80;
+            --secondary: #166534;
+            --bg: #f0fdf4;
+            --card-bg: rgba(255, 255, 255, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.62 50l-6.363 6.364a3 3 0 0 1-4.243 0L39.77 52.12a3 3 0 0 1 0-4.243l6.364-6.364a3 3 0 0 1 4.243 0L54.62 50zm-33.15 0l-6.363 6.364a3 3 0 0 1-4.243 0L6.626 52.12a3 3 0 0 1 0-4.243l6.364-6.364a3 3 0 0 1 4.243 0L21.47 50zM5.314 30.556l6.364-6.364a3 3 0 0 1 4.243 0l4.242 4.242a3 3 0 0 1 0 4.243l-6.364 6.364a3 3 0 0 1-4.243 0L5.314 34.8a3 3 0 0 1 0-4.243zM38.455 30.556l6.364-6.364a3 3 0 0 1 4.243 0l4.242 4.242a3 3 0 0 1 0 4.243l-6.364 6.364a3 3 0 0 1-4.243 0L38.455 34.8a3 3 0 0 1 0-4.243z' fill='%2322c55e' fill-opacity='0.05' fill-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
+            color: var(--secondary);
+            font-family: 'Nunito', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .nature-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            padding: 50px 20px;
+        }
+
+        /* Floating Leaves */
+        .leaf {
+            position: absolute;
+            font-size: 20px;
+            animation: floatDown 10s linear infinite;
+            opacity: 0.6;
+            z-index: 0;
+            color: var(--primary);
+        }
+
+        @keyframes floatDown {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        /* Hero Blob */
+        .hero {
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(135deg, #dcfce7 0%, #ffffff 100%);
+            padding: 80px 40px;
+            text-align: center;
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            margin-bottom: 60px;
+            animation: breathe 5s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            }
+
+            50% {
+                border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            }
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        /* Reasons Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .nature-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 30px;
+            border-radius: 30px 30px 30px 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .nature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .nature-card h3 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        /* Flower Button */
+        .bloom-btn {
+            background: var(--primary);
+            color: white;
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            margin: 60px auto 0;
+            box-shadow: 0 10px 20px rgba(74, 222, 128, 0.4);
+            transition: all 0.3s;
+            position: relative;
+            z-index: 10;
+        }
+
+        .bloom-btn:hover {
+            transform: scale(1.1);
+            background: var(--secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="leafContainer"></div>
+
+    <div class="nature-container">
+        <div class="hero">
+            <h1 id="partnerNameDisplay">Natural Love</h1>
+            <p id="taglineDisplay" style="font-size: 1.2rem; margin-top: 10px;">Grown with care...</p>
+        </div>
+
+        <div class="grid" id="reasonsGrid">
+            <!-- JS Populated -->
+        </div>
+
+        <button class="bloom-btn" onclick="triggerFinale()">Let Love Bloom (YES)</button>
+    </div>
+
+    <script>
+        const DEFAULT_CONFIG = {
+            style: 'nature',
+            partnerName: "My Flower",
+            tagline: "Blooming every day...",
+            reasons: [
+                { title: "Growth", body: "We grow together." },
+                { title: "Beauty", body: "You are natural beauty." }
+            ]
+        };
+
+        let config = window.VALENTINE_CONFIG || DEFAULT_CONFIG;
+
+        function createLeaves() {
+            const container = document.getElementById('leafContainer');
+            const icons = ['🌿', '🍃', '🍀', '🍂'];
+            for (let i = 0; i < 20; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                leaf.innerText = icons[Math.floor(Math.random() * icons.length)];
+                leaf.style.left = Math.random() * 100 + '%';
+                leaf.style.animationDelay = Math.random() * 5 + 's';
+                leaf.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                container.appendChild(leaf);
+            }
+        }
+
+        function init() {
+            document.getElementById('partnerNameDisplay').innerText = config.partnerName || "Natural Love";
+            document.getElementById('taglineDisplay').innerText = config.tagline || "Grown with care...";
+
+            const grid = document.getElementById('reasonsGrid');
+            grid.innerHTML = '';
+
+            (config.reasons || []).forEach((r, i) => {
+                const div = document.createElement('div');
+                div.className = 'nature-card';
+                div.innerHTML = `
+                    <h3>${r.title}</h3>
+                    <p>${r.body}</p>
+                `;
+                grid.appendChild(div);
+            });
+
+            createLeaves();
+        }
+
+        function triggerFinale() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#4ade80', '#166534', '#a3e635'],
+                shapes: ['circle'] // confetti shapes supports circle/square by default
+            });
+            alert("🌸 Love is Blooming! 🌸");
+        }
+
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'UPDATE_CONFIG') {
+                config = { ...config, ...e.data.payload };
+                init();
+            }
+        });
+
+        init();
+    </script>
+</body>
+
+</html>
