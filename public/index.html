@@ -58,14 +58,63 @@
             --radius-lg: 16px;
             --radius-xl: 24px;
             --radius-2xl: 32px;
+            --radius-round: 9999px;
 
             /* ═══ Typography ═══ */
             --font-display: 'Playfair Display', Georgia, serif;
             --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-            /* ═══ Animation ═══ */
-            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* ═══ Transitions ═══ */
+            --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+            --ease-spring: cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        /* ═══════════════════════════════════════
+           DARK MODE OVERRIDES
+        ═══════════════════════════════════════ */
+        body.dark-mode {
+            --bg-primary: #121212;
+            --bg-secondary: #1E1E1E;
+            --bg-soft-pink: #2a1b1d;
+            --bg-rose: #2d1e21;
+
+            --pink-50: #1a0f11;
+            --pink-100: #2d161a;
+            --pink-200: #4a1d25;
+            --pink-300: #7e2439;
+            --pink-400: #FB7185;
+            /* Keep minimal accent bright */
+
+            /* Invert Text */
+            --text-primary: #f3f4f6;
+            --text-secondary: #d1d5db;
+            --text-muted: #6b7280;
+
+            --border-light: rgba(255, 255, 255, 0.1);
+            --border-pink: rgba(225, 29, 72, 0.4);
+
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        body.dark-mode .canvas-pattern {
+            opacity: 0.05;
+            background-image: radial-gradient(#ffffff 1px, transparent 1px);
+        }
+
+        body.dark-mode .titanium-frame {
+            box-shadow: 0 0 0 4px #333, 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+            background: #111;
+        }
+
+        body.dark-mode .feature-item {
+            background: #1e1e1e;
+        }
+
+        body.dark-mode .feature-item:hover {
+            background: #2d161a;
+            border-color: var(--pink-700);
         }
 
         /* ═══════════════════════════════════════
@@ -1730,6 +1779,18 @@
         function App() {
             const [activeSection, setActiveSection] = useState('themes');
             const [mode, setMode] = useState('desktop');
+
+            const [showTooltip, setShowTooltip] = useState('');
+            const [darkMode, setDarkMode] = useState(false);
+
+            // Toggle Dark Mode Class on Body
+            useEffect(() => {
+                if (darkMode) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }, [darkMode]);
             const [orientation, setOrientation] = useState('portrait');
             const [loading, setLoading] = useState(true);
             const [orderData, setOrderData] = useState(null);
@@ -1752,7 +1813,7 @@
             const [mediaRecorder, setMediaRecorder] = useState(null);
 
             // V17 UI State
-            const [darkMode, setDarkMode] = useState(true);
+
             const [weekMode, setWeekMode] = useState('all'); // 'all', 'rose', 'propose', etc.
 
             // User Auth State
@@ -1760,6 +1821,8 @@
             const [authModal, setAuthModal] = useState(null); // 'login' | 'register' | null
             const [authLoading, setAuthLoading] = useState(false);
             const [authError, setAuthError] = useState('');
+            const [adminPassword, setAdminPassword] = useState('');
+            const [isAdmin, setIsAdmin] = useState(false);
 
             // My Orders State
             const [myOrders, setMyOrders] = useState([]);
@@ -2044,6 +2107,18 @@
 
             const handleCheckout = async () => {
                 confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#f43f5e', '#a855f7', '#fb7185'] });
+
+                if (isAdmin) {
+                    // ADMIN BYPASS
+                    alert("Admin Bypass: Publishing directly (Free for You!)");
+                    setTimeout(() => {
+                        setOrderData({ id: 'admin-' + Date.now(), status: 'paid', amount: 0, valentineId: 'admin-' + Date.now(), success: true });
+                        setUpiModal(null); // No payment modal opacity
+                        setLoading(false);
+                    }, 1000);
+                    return;
+                }
+
                 try {
                     const res = await fetch('/api/create-order', {
                         method: 'POST',
@@ -2286,8 +2361,27 @@
                                 </>
                             )}
                             <div className="toolbar-divider"></div>
+                            <button
+                                className="toolbar-btn"
+                                onClick={() => setDarkMode(!darkMode)}
+                                onMouseEnter={() => setShowTooltip('Toggle Dark Mode')}
+                                onMouseLeave={() => setShowTooltip('')}
+                                style={{ position: 'relative' }}
+                            >
+                                {darkMode ? '☀️' : '🌙'}
+                                {showTooltip === 'Toggle Dark Mode' && (
+                                    <div style={{
+                                        position: 'absolute', top: '120%', left: '50%', transform: 'translateX(-50%)',
+                                        background: 'rgba(0,0,0,0.8)', color: 'white', padding: '4px 8px', borderRadius: '4px',
+                                        fontSize: '11px', whiteSpace: 'nowrap', pointerEvents: 'none', zIndex: 100
+                                    }}>
+                                        {darkMode ? 'Light Mode' : 'Dark Mode'}
+                                    </div>
+                                )}
+                            </button>
+                            <div className="toolbar-divider"></div>
                             <button className="toolbar-btn" onClick={() => setZoomLevel(Math.max(50, zoomLevel - 25))}>➖</button>
-                            <span style={{ fontSize: '12px', color: '#a1a1aa', minWidth: '45px', textAlign: 'center' }}>{zoomLevel}%</span>
+                            <span style={{ fontSize: '12px', color: darkMode ? '#a1a1aa' : '#a1a1aa', minWidth: '45px', textAlign: 'center' }}>{zoomLevel}%</span>
                             <button className="toolbar-btn" onClick={() => setZoomLevel(Math.min(150, zoomLevel + 25))}>➕</button>
                             <div className="toolbar-divider"></div>
                             <button className={`toolbar-btn ${soundEnabled ? 'active' : ''}`} onClick={() => setSoundEnabled(!soundEnabled)} title="Sound Effects">{soundEnabled ? '🔊' : '🔇'}</button>
@@ -2352,18 +2446,52 @@
                                             {activeSection === 'timeline' && '📅 Our Story'}
                                             {activeSection === 'style' && '🎭 Customize Style'}
                                             {activeSection === 'templates' && '📋 Quick Templates'}
-                                            {activeSection === 'settings' && '⚙️ Settings'}
-                                        </div>
-                                        <div className="panel-subtitle">
-                                            {activeSection === 'orders' && 'Your purchase history & links'}
-                                            {activeSection === 'themes' && `${THEMES.length} beautiful themes`}
-                                            {activeSection === 'style' && 'Colors, fonts & animations'}
-                                            {activeSection === 'templates' && 'One-click setup'}
+                                            {/* ADMIN LOGIN MODAL */}
+                                            {authModal === 'admin' && (
+                                                <div className="modal-overlay active" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.5)' }}>
+                                                    <div className="modal-content" style={{ width: 400, padding: 30, background: 'var(--bg-secondary)', borderRadius: 20, boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}>
+                                                        <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+                                                            <h3 className="modal-title" style={{ margin: 0 }}>🔐 Admin Access</h3>
+                                                            <button className="btn-no" onClick={() => setAuthModal(null)} style={{ border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer' }}>✕</button>
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                                            <input
+                                                                type="password"
+                                                                className="form-input"
+                                                                placeholder="Enter Admin Password"
+                                                                value={adminPassword}
+                                                                onChange={(e) => setAdminPassword(e.target.value)}
+                                                            />
+                                                            {authError && <p style={{ color: 'red', fontSize: 13 }}>{authError}</p>}
+                                                            <button className="btn-primary" onClick={() => {
+                                                                if (adminPassword === 'Satya@912266') {
+                                                                    setIsAdmin(true);
+                                                                    setCurrentUser({ id: 'admin', name: 'Admin User', plan: 'premium' });
+                                                                    setAuthModal(null);
+                                                                    alert('Admin Access Granted! You have full access.');
+                                                                } else {
+                                                                    setAuthError('Invalid Password');
+                                                                }
+                                                            }}>Unlock Admin Mode</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
                                         </div>
                                     </div>
-                                    <button className="panel-close" onClick={() => setActiveSection(null)}>✕</button>
-                                </div>
-                                <div className="panel-body">
+
+                                    {/* SETTINGS SECTION (With Admin Link) */}
+                                    {activeSection === 'settings' && (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                            <div className="card">
+                                                <h3>⚙️ Project Settings</h3>
+                                                <button className="btn-secondary" style={{ marginTop: 20 }} onClick={() => setAuthModal('admin')}>
+                                                    🔐 Admin Login
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {/* MY ORDERS SECTION */}
                                     {activeSection === 'orders' && (
